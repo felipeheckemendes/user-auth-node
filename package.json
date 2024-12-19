@@ -1,0 +1,36 @@
+{
+  "name": "user-auth",
+  "version": "0.1.0",
+  "description": "A side project to build a user authentication system using Node.js, Express, JWT and MongoDB.",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/felipeheckemendes/user-auth-node.git"
+  },
+  "author": "Felipe Mendes",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/felipeheckemendes/user-auth-node/issues"
+  },
+  "homepage": "https://github.com/felipeheckemendes/user-auth-node#readme",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.9.2"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.1",
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "eslint-plugin-react": "^7.37.2",
+    "prettier": "^3.4.2"
+  }
+}
