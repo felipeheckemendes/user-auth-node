@@ -38,7 +38,7 @@ const app = express();
 app.use(express.json({ limit: '10kb' })); // Body parser
 
 // EXPRESS - Routes
-// app.use('/api/v1/users', userRouter);
+app.use('/api/v1/users', userRouter);
 // 404 error response:
 app.all('*', (req, res, next) => {
   res.status(404).json({
