@@ -3,62 +3,62 @@ const bcrypt = require('bcryptjs');
 
 const AppError = require('../utils/appError');
 
-const userSchema = new mongoose.Schema({
-  createdAt: {
-    type: Date,
-    default: Date.now(),
-    immutable: true,
-  },
-  email: {
-    type: String,
-    index: true,
-    unique: true,
-    sparse: true,
-    lowercase: true,
-    match: [/^\S+@\S+\.\S+$/, 'Please enter a valid email address '],
-    validate: {
-      validator: async function (email) {
-        const user = await this.constructor.findOne({ email });
-        if (user !== null) return false;
+const userSchema = new mongoose.Schema(
+  {
+    email: {
+      type: String,
+      index: true,
+      unique: true,
+      sparse: true,
+      lowercase: true,
+      match: [/^\S+@\S+\.\S+$/, 'Please enter a valid email address '],
+      validate: {
+        validator: async function (email) {
+          const user = await this.constructor.findOne({ email });
+          if (user !== null) return false;
+        },
+        message: 'Email already in use.',
       },
-      message: 'Email already in use.',
+    },
+    cellphone: {
+      type: String,
+      index: true,
+      unique: true,
+      sparse: true,
+      match: [
+        /^\+((?:9[679]|8[035789]|6[789]|5[90]|42|3[578]|2[1-689])|9[0-58]|8[1246]|6[0-6]|5[1-8]|4[013-9]|3[0-469]|2[70]|7|1)(?:\d){0,13}\d$/,
+        'Please enter a valid international phone number',
+      ], // Regex validator for international numbers starting with '+'
+      validate: {
+        validator: async function (cellphone) {
+          const user = await this.constructor.findOne({ cellphone });
+          if (user) return false;
+          return true;
+        },
+        message: 'Cellphone already in use.',
+      },
+    },
+    password: {
+      type: String,
+      required: true,
+      minLength: 8,
+    },
+    passwordConfirm: {
+      type: String,
+      required: true,
+      minLength: 8,
+      validate: {
+        validator: function (passwordConfirm) {
+          return passwordConfirm === this.password;
+        },
+        message: 'Passwords do not match',
+      },
     },
   },
-  cellphone: {
-    type: String,
-    index: true,
-    unique: true,
-    sparse: true,
-    match: [
-      /^\+((?:9[679]|8[035789]|6[789]|5[90]|42|3[578]|2[1-689])|9[0-58]|8[1246]|6[0-6]|5[1-8]|4[013-9]|3[0-469]|2[70]|7|1)(?:\d){0,13}\d$/,
-      'Please enter a valid international phone number',
-    ], // Regex validator for international numbers starting with '+'
-    validate: {
-      validator: async function (cellphone) {
-        const user = await this.constructor.findOne({ cellphone });
-        if (user) return false;
-        return true;
-      },
-      message: 'Cellphone already in use.',
-    },
+  {
+    timestamps: true,
   },
-  password: {
-    type: String,
-    required: true,
-    minLength: 8,
-  },
-  passwordConfirm: {
-    type: String,
-    required: true,
-    minLength: 8,
-    validate: {
-      validator: function (passwordConfirm) {
-        return passwordConfirm === this.password;
-      },
-      message: 'Passwords do not match',
-    },
-  },
-});
+);
 
 // VALIDATOR: Require email or phone
 userSchema.pre('save', function (next) {

@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const path = require('path');
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
+
 chai.use(chaiAsPromised);
 const { expect } = chai;
 const sinon = require('sinon');
@@ -219,7 +220,8 @@ describe('1. User Controller sign-up', () => {
       password: '123456789',
       passwordConfirm: '123456789',
     };
-    const user = await User.create(body);
+    await User.create(body);
+    const user = User.find({ email: 'name@email.com' });
     await expect(user.createdAt).to.not.be.equal(customDate);
   });
 });
