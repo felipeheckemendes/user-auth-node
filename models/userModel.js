@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 
 const AppError = require('../utils/appError');
 
@@ -56,6 +57,14 @@ userSchema.pre('save', function (req, res, next) {
     );
   }
   return next();
+});
+
+// ENCRYPTION: Encrypt user password using bcrypt
+userSchema.pre('save', async function (req, res, next) {
+  if (!this.isModified('password')) return next(); // Only encrypt if password was modified
+  this.password = await bcrypt.hash(this.password, 12);
+  this.passwordConfirm = undefined;
+  next();
 });
 
 const User = mongoose.Model('User', userSchema);
