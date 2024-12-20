@@ -15,6 +15,7 @@ const userSchema = new mongoose.Schema({
     unique: true,
     sparse: true,
     lowercase: true,
+    match: [/^\S+@\S+\.\S+$/, 'Please enter a valid email address '],
     validate: {
       validator: async function (email) {
         const user = await this.constructor.findOne({ email });
@@ -28,8 +29,17 @@ const userSchema = new mongoose.Schema({
     index: true,
     unique: true,
     sparse: true,
-    match:
-      /^\+((?:9[679]|8[035789]|6[789]|5[90]|42|3[578]|2[1-689])|9[0-58]|8[1246]|6[0-6]|5[1-8]|4[013-9]|3[0-469]|2[70]|7|1)(?:\d){0,13}\d$/, // Regex validator for international numbers starting with '+'
+    match: [
+      /^\+((?:9[679]|8[035789]|6[789]|5[90]|42|3[578]|2[1-689])|9[0-58]|8[1246]|6[0-6]|5[1-8]|4[013-9]|3[0-469]|2[70]|7|1)(?:\d){0,13}\d$/,
+      'Please enter a valid international phone number',
+    ], // Regex validator for international numbers starting with '+'
+    validate: {
+      validator: async function (phone) {
+        const user = await this.constructor.findOne({ phone });
+        if (user) return false;
+      },
+      message: 'Cellphone already in use.',
+    },
   },
   password: {
     type: String,
@@ -50,7 +60,7 @@ const userSchema = new mongoose.Schema({
 });
 
 // VALIDATOR: Require email or phone
-userSchema.pre('save', function (req, res, next) {
+userSchema.pre('save', function (next) {
   if (!this.email && !this.phone) {
     return next(
       new AppError('Either email or cellphone must be provided for sign up. Please try again.'),
@@ -60,12 +70,12 @@ userSchema.pre('save', function (req, res, next) {
 });
 
 // ENCRYPTION: Encrypt user password using bcrypt
-userSchema.pre('save', async function (req, res, next) {
+userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next(); // Only encrypt if password was modified
   this.password = await bcrypt.hash(this.password, 12);
   this.passwordConfirm = undefined;
   next();
 });
 
-const User = mongoose.Model('User', userSchema);
+const User = mongoose.model('User', userSchema);
 module.exports = User;
