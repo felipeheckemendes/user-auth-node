@@ -19,7 +19,7 @@ const userSchema = new mongoose.Schema({
     validate: {
       validator: async function (email) {
         const user = await this.constructor.findOne({ email });
-        if (user) return false;
+        if (user !== null) return false;
       },
       message: 'Email already in use.',
     },
@@ -34,9 +34,10 @@ const userSchema = new mongoose.Schema({
       'Please enter a valid international phone number',
     ], // Regex validator for international numbers starting with '+'
     validate: {
-      validator: async function (phone) {
-        const user = await this.constructor.findOne({ phone });
+      validator: async function (cellphone) {
+        const user = await this.constructor.findOne({ cellphone });
         if (user) return false;
+        return true;
       },
       message: 'Cellphone already in use.',
     },
@@ -61,9 +62,12 @@ const userSchema = new mongoose.Schema({
 
 // VALIDATOR: Require email or phone
 userSchema.pre('save', function (next) {
-  if (!this.email && !this.phone) {
+  if (!this.email && !this.cellphone) {
     return next(
-      new AppError('Either email or cellphone must be provided for sign up. Please try again.'),
+      new AppError(
+        'Either email or cellphone must be provided for sign up. Please try again.',
+        403,
+      ),
     );
   }
   return next();
