@@ -4,7 +4,7 @@
   "description": "A side project to build a user authentication system using Node.js, Express, JWT and MongoDB.",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha --async-stack-traces --full-trace --timeout 5000",
     "start": "nodemon server.js"
   },
   "repository": {
@@ -25,6 +25,8 @@
     "mongoose": "^8.9.2"
   },
   "devDependencies": {
+    "chai": "^4.3.6",
+    "chai-as-promised": "^7.1.1",
     "eslint": "^8.57.1",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-config-prettier": "^9.1.0",
@@ -33,6 +35,8 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-prettier": "^5.2.1",
     "eslint-plugin-react": "^7.37.2",
-    "prettier": "^3.4.2"
+    "mocha": "^11.0.1",
+    "prettier": "^3.4.2",
+    "sinon": "^19.0.2"
   }
 }
