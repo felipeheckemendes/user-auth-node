@@ -12,6 +12,7 @@ const sinon = require('sinon');
 const { before, after, describe, it, beforeEach } = require('mocha');
 const dotenv = require('dotenv');
 
+const app = require('../app');
 const userController = require('../controllers/userController');
 const User = require('../models/userModel');
 
@@ -231,5 +232,39 @@ describe('1. User Controller sign-up', () => {
     await User.create(body);
     const user = User.find({ email: 'name@email.com' });
     await expect(user.createdAt).to.not.be.equal(customDate);
+  });
+
+  it('user should be persisted on the database after signup', async () => {
+    const user = {
+      email: 'john@example.com',
+      password: 'password123',
+      passwordConfirm: 'password123',
+    };
+
+    const res = await chai.request(app).post('/api/v1/users/signup').send(user);
+
+    // Verify user was saved in the database
+    const userInDb = await User.findOne({ email: user.email });
+    expect(userInDb).to.exist;
+    expect(userInDb.name).to.equal(user.name);
+    expect(userInDb.email).to.equal(user.email);
+  });
+
+  it('should send a JWT token in the response', async () => {
+    const user = {
+      email: 'john@example.com',
+      password: 'password123',
+      passwordConfirm: 'password123',
+    };
+
+    const res = await chai.request(app).post('/api/v1/users/signup').send(user);
+
+    expect(res).to.have.status(201);
+    expect(res.body).to.have.property('status').that.equals('success');
+    expect(res.body).to.have.property('token').that.is.a('string');
+    expect(res.body).to.have.property('data');
+    expect(res.body.data).to.include({
+      email: user.email,
+    });
   });
 });
