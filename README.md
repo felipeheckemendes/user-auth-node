@@ -4,6 +4,8 @@ This is an **ongoing** side project where I intend build a user authentication s
 
 ## To-dos (project requirements)
 
+- [ ] Add production global error handling middleware
+- [ ] Add global exception and rejection error handling
 - [ ] Add Signin functionality after Signup
 - [ ] Add Signin route and functionality
 - [ ] Create Logout functionality
@@ -22,3 +24,4 @@ This is an **ongoing** side project where I intend build a user authentication s
 ## Done
 
 - [x] Create a basic Sign-up functionality
+- [x] Add development global error handling middleware

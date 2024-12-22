@@ -2,6 +2,7 @@
 const express = require('express');
 
 const userRouter = require('./routes/userRoutes');
+const errorController = require('./controllers/errorController');
 
 // EXPRESS - Initialize
 const app = express();
@@ -18,6 +19,7 @@ app.all('*', (req, res, next) => {
     message: `Can't find ${req.originalUrl} on this server`,
   });
 });
-
+// EXPRESS - Global error controller middleware
+app.use(errorController);
 // Export app
 module.exports = app;
