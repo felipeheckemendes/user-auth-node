@@ -268,3 +268,105 @@ describe('1. User Controller sign-up', () => {
     });
   });
 });
+
+describe('2. User Controller log-in', () => {
+  it('user should receive back a token if email and password are correct', async () => {
+    const user = {
+      email: 'john@example.com',
+      password: 'password123',
+      passwordConfirm: 'password123',
+    };
+
+    await chai.request(app).post('/api/v1/users/signup').send(user);
+
+    const res = await chai.request(app).post('/api/v1/users/login').send(user);
+    // Verify that user received token back after login
+    expect(res).to.have.status(201);
+    expect(res.body).to.have.property('status').that.equals('success');
+    expect(res.body).to.have.property('token').that.is.a('string');
+    expect(res.body).to.have.property('data');
+    expect(res.body.data).to.include({
+      email: user.email,
+    });
+  });
+
+  it('user should receive an fail response if no email or phone was provided', async () => {
+    const user = {
+      email: 'john@example.com',
+      password: 'password123',
+      passwordConfirm: 'password123',
+    };
+
+    await chai.request(app).post('/api/v1/users/signup').send(user);
+
+    const res = await chai.request(app).post('/api/v1/users/login').send({
+      password: 'password123',
+    });
+    // Verify that user received error
+    expect(res).to.have.status(400);
+    expect(res.body).to.have.property('status').that.equals('fail');
+  });
+
+  it('user should receive a fail response if email is incorrect and no phone provided', async () => {
+    const user = {
+      email: 'john@example.com',
+      password: 'password123',
+      passwordConfirm: 'password123',
+    };
+
+    await chai.request(app).post('/api/v1/users/signup').send(user);
+
+    const res = await chai.request(app).post('/api/v1/users/login').send({
+      email: 'wronguser@example.com',
+      password: 'password123',
+    });
+    // Verify that user received error
+    expect(res).to.have.status(400);
+    expect(res.body).to.have.property('status').that.equals('fail');
+  });
+
+  it('user should receive a fail response if cellphone is incorrect and no email provided', async () => {
+    const user = {
+      cellphone: '+554112345678',
+      password: 'password123',
+      passwordConfirm: 'password123',
+    };
+
+    await chai.request(app).post('/api/v1/users/signup').send(user);
+
+    const res = await chai.request(app).post('/api/v1/users/login').send({
+      cellphone: '+554199999999',
+      password: 'password123',
+    });
+    // Verify that user received error
+    expect(res).to.have.status(400);
+    expect(res.body).to.have.property('status').that.equals('fail');
+  });
+
+  it('user should succesfully login if email is correct but password not', async () => {
+    const user = {
+      email: 'john@example.com',
+      cellphone: '+554112345678',
+      password: 'password123',
+      passwordConfirm: 'password123',
+    };
+
+    await chai.request(app).post('/api/v1/users/signup').send(user);
+
+    const res = await chai.request(app).post('/api/v1/users/login').send({
+      email: 'john@example.com',
+      cellphone: '+554199999999',
+      password: 'password123',
+    });
+    // Verify that user received token back after login
+    expect(res).to.have.status(201);
+    expect(res.body).to.have.property('status').that.equals('success');
+    expect(res.body).to.have.property('token').that.is.a('string');
+    expect(res.body).to.have.property('data');
+    expect(res.body.data).to.include({
+      email: user.email,
+    });
+  });
+
+  // describe closing
+});

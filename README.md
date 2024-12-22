@@ -6,8 +6,7 @@ This is an **ongoing** side project where I intend build a user authentication s
 
 - [ ] Add production global error handling middleware
 - [ ] Add global exception and rejection error handling
-- [ ] Add Signin functionality after Signup
-- [ ] Add Signin route and functionality
+- [ ] Send jwt through cookies upon Login
 - [ ] Create Logout functionality
 - [ ] Create forgot password and password reset functionality
 - [ ] Create a getme user info functionality
@@ -20,8 +19,11 @@ This is an **ongoing** side project where I intend build a user authentication s
 ## More ideas to implement
 
 - [ ] Two factor authentication
+- [ ] Maximum login attempts
 
 ## Done
 
 - [x] Create a basic Sign-up functionality
 - [x] Add development global error handling middleware
+- [x] Add token response after Signup
+- [x] Add Login route and functionality
