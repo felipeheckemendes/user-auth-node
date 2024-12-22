@@ -3,11 +3,13 @@ const mongoose = require('mongoose');
 const path = require('path');
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
+const chaiHttp = require('chai-http');
 
 chai.use(chaiAsPromised);
+chai.use(chaiHttp);
 const { expect } = chai;
 const sinon = require('sinon');
-const { before, after, describe, it } = require('mocha');
+const { before, after, describe, it, beforeEach } = require('mocha');
 const dotenv = require('dotenv');
 
 const userController = require('../controllers/userController');
@@ -16,6 +18,7 @@ const User = require('../models/userModel');
 const { ValidationError } = mongoose.Error; // Import ValidationError from Mongoose
 const AppError = require('../utils/appError');
 
+// Start up database
 before(async () => {
   try {
     dotenv.config({ path: path.join(__dirname, '..', '/.env'), encoding: 'utf8', debug: false });
@@ -27,6 +30,11 @@ before(async () => {
     console.error('Failed to connect to test database:', err);
     process.exit(1);
   }
+});
+
+// Clear the database before each test
+beforeEach(async () => {
+  await User.deleteMany({});
 });
 
 // Disconnect from the test database after all tests
