@@ -11,6 +11,13 @@ const createAndSendToken = (statusCode, user, res) => {
     exp: Math.floor(Date.now() / 1000 + 60 * 24 * process.env.JWT_EXPIRES_DAYS),
   };
   const token = jwt.sign(payload, process.env.JWTSECRET);
+
+  const cookieOptions = {};
+  cookieOptions.expires = new Date(Date.now() + process.env.JWT_EXPIRES_DAYS * 24 * 60 * 60 * 1000);
+  cookieOptions.httpOnly = true; // This restricts cookie to the browser
+  cookieOptions.secure = process.env.NODE_ENV !== 'development'; // Cookie is sent only on https if not in production
+
+  res.cookie('jwt', token, cookieOptions);
   res.status(statusCode).json({
     status: 'success',
     token: token,
