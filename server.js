@@ -2,10 +2,9 @@
 const process = require('process');
 const path = require('path');
 const dotenv = require('dotenv');
-const express = require('express');
 const mongoose = require('mongoose');
 
-const userRouter = require('./routes/userRoutes');
+const app = require('./app');
 
 // CONFIGURATIONS
 dotenv.config({ path: path.join(__dirname, '/.env'), encoding: 'utf8', debug: false });
@@ -24,30 +23,13 @@ mongoose
     serverSelectionTimeoutMS: 5000, // Exit fast when DB is unresponsive
   })
   .then(() => {
-    console.log('Mongo DB connection successfull.\n');
+    console.log('✅ Mongo DB connection successfull.\n');
   })
   .catch((err) => {
-    console.error('Mongo DB connection failed:\n', err);
+    console.error('❌ Mongo DB connection failed:\n', err);
   });
-
-// EXPRESS
-// EXPRESS - Initialize
-const app = express();
-
-// EXPRESS - General Middleware
-app.use(express.json({ limit: '10kb' })); // Body parser
-
-// EXPRESS - Routes
-app.use('/api/v1/users', userRouter);
-// 404 error response:
-app.all('*', (req, res, next) => {
-  res.status(404).json({
-    status: 'fail',
-    message: `Can't find ${req.originalUrl} on this server`,
-  });
-});
 
 // EXPRESS - Start server
 app.listen(port, () => {
-  console.log(`Server started and running on port ${port}.\n`);
+  console.log(`✅ Server started and running on port ${port}.\n`);
 });
