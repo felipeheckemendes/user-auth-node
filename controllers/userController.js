@@ -55,3 +55,29 @@ exports.login = async (req, res, next) => {
   // Send JWT token back to user
   createAndSendToken(201, user, res);
 };
+
+exports.isAuthenticated = async (req, res, next) => {
+  // If authentication header is present, try to get the Bearer Token
+  let token;
+  if (!req.headers.authorization && req.headers.authorization.startsWith('Bearer'))
+    token = req.headers.ahtorization.split(' ')[1];
+  // Check if JWT Bearer Token was sent on headers and is valid
+  if (!token || !jwt.verify(token, process.env.JWTSECRET))
+    return next(new AppError('You are not logged in. Please log in to access this resource'));
+  // Decode token and find user
+  const tokenPayload = jwt.decode(token);
+  const user = await User.findById(tokenPayload.id);
+  // Check if  user still exists
+  if (!user)
+    return next(new AppError('You are not logged in. Please log in to access this resource'));
+  // Check if token has expired
+  if (!tokenPayload.exp || !tokenPayload.iat || Date(tokenPayload.exp * 1000) < Date.now())
+    //tokenPayload.iat is redundant, but is implemented in the odd case a token might perchance be issued without iat
+    return next(new AppError('Your login has expired. Please login again.'));
+  // Check if user has changed password after token issued
+  if (user.passwordUpdatedAt && user.passwordUpdatedAt > Date(tokenPayload.iat * 1000))
+    return next(new AppError('You need to login again after changing your password'));
+  // If all checks have passed, add user to request, and go to next middleware
+  req.user = user;
+  next();
+};
