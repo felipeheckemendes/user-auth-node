@@ -40,58 +40,75 @@ const createAndSendToken = (statusCode, user, res) => {
 };
 
 exports.signup = async (req, res, next) => {
-  const user = await User.create(req.body);
-  createAndSendToken(201, user, res);
+  try {
+    const user = await User.create(req.body);
+    createAndSendToken(201, user, res);
+  } catch (err) {
+    return next(err);
+  }
 };
 
 exports.login = async (req, res, next) => {
-  // Check if user provided either email or cellphone
-  if (!req.body.email && !req.body.cellphone) {
-    const errMessage =
-      'No email or cellphone number provided. Please provide at least one in order to login';
-    return next(new AppError(errMessage, 400));
+  try {
+    // Check if user provided either email or cellphone
+    if (!req.body.email && !req.body.cellphone) {
+      const errMessage =
+        'No email or cellphone number provided. Please provide at least one in order to login';
+      return next(new AppError(errMessage, 400));
+    }
+    // Check if user provided password
+    if (!req.body.password) {
+      const errMessage = 'No password provided. Please provide password in order to login';
+      return next(new AppError(errMessage, 400));
+    }
+    // Find user either using email or cellphone
+    let user;
+    if (req.body.email) user = await User.findOne({ email: req.body.email }).select('+password');
+    else if (req.body.cellphone)
+      user = await User.findOne({ cellphone: req.body.cellphone }).select('+password');
+    // Check if email/cellphone and password provided are valid
+    if (!user || !(await bcrypt.compare(req.body.password, user.password))) {
+      const errMessage = 'Email/cellphone or password are not valid. Please try again.';
+      return next(new AppError(errMessage, 400));
+    }
+    // Send JWT token back to user
+    createAndSendToken(201, user, res);
+  } catch (err) {
+    return next(err);
   }
-  // Check if user provided password
-  if (!req.body.password) {
-    const errMessage = 'No password provided. Please provide password in order to login';
-    return next(new AppError(errMessage, 400));
-  }
-  // Find user either using email or cellphone
-  let user;
-  if (req.body.email) user = await User.findOne({ email: req.body.email }).select('+password');
-  else if (req.body.cellphone)
-    user = await User.findOne({ cellphone: req.body.cellphone }).select('+password');
-  // Check if email/cellphone and password provided are valid
-  if (!user || !(await bcrypt.compare(req.body.password, user.password))) {
-    const errMessage = 'Email/cellphone or password are not valid. Please try again.';
-    return next(new AppError(errMessage, 400));
-  }
-  // Send JWT token back to user
-  createAndSendToken(201, user, res);
 };
 
 exports.isAuthenticated = async (req, res, next) => {
-  // If authentication header is present, try to get the Bearer Token
-  let token;
-  if (req.headers.authorization && req.headers.authorization.startsWith('Bearer'))
-    token = req.headers.authorization.split(' ')[1];
-  // Check if JWT Bearer Token was sent on headers and is valid
-  if (!token || !validateToken(token))
-    return next(new AppError('You are not logged in. Please log in to access this resource', 401));
-  // Decode token and find user
-  const tokenPayload = jwt.decode(token);
-  const user = await User.findById(tokenPayload.id);
-  // Check if  user still exists
-  if (!user)
-    return next(new AppError('You are not logged in. Please log in to access this resource', 401));
-  // Check if token has expired
-  if (!tokenPayload.exp || !tokenPayload.iat || Date(tokenPayload.exp * 1000) < Date.now())
-    //tokenPayload.iat is redundant, but is implemented in the odd case a token might perchance be issued without iat
-    return next(new AppError('Your login has expired. Please login again.', 401));
-  // Check if user has changed password after token issued
-  if (user.passwordUpdatedAt && user.passwordUpdatedAt > Date(tokenPayload.iat * 1000))
-    return next(new AppError('You need to login again after changing your password', 401));
-  // If all checks have passed, add user to request, and go to next middleware
-  req.user = user;
-  return next();
+  try {
+    // If authentication header is present, try to get the Bearer Token
+    let token;
+    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer'))
+      token = req.headers.authorization.split(' ')[1];
+    // Check if JWT Bearer Token was sent on headers and is valid
+    if (!token || !validateToken(token))
+      return next(
+        new AppError('You are not logged in. Please log in to access this resource', 401),
+      );
+    // Decode token and find user
+    const tokenPayload = jwt.decode(token);
+    const user = await User.findById(tokenPayload.id);
+    // Check if  user still exists
+    if (!user)
+      return next(
+        new AppError('You are not logged in. Please log in to access this resource', 401),
+      );
+
+    // Check if token has expired -> Not necessary since jwt.verify already checks for expiry
+    // if (!tokenPayload.exp || !tokenPayload.iat || Date(tokenPayload.exp * 1000) < Date.now())
+    // return next(new AppError('You are not logged in. Please log in to access this resource', 401));
+
+    // Check if user has changed password after token issued
+    if (user.passwordUpdatedAt && user.passwordUpdatedAt > Date(tokenPayload.iat * 1000))
+      return next(new AppError('You need to login again after changing your password', 401));
+    // If all checks have passed, add user to request, and go to next middleware
+    req.user = user;
+    return next();
+  } catch (err) {
+    return next(err);
+  }
 };
