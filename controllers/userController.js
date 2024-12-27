@@ -112,3 +112,46 @@ exports.isAuthenticated = async (req, res, next) => {
     return next(err);
   }
 };
+
+exports.updatePassword = async (req, res, next) => {
+  try {
+    // Check if request body is well-formed
+    if (!req.body.currentPassword || !req.body.newPassword || !req.body.newPasswordConfirm)
+      return next(
+        new AppError(
+          'Please provide both currentPassword, newPassword and newPasswordConfirm in order to reset password',
+          400,
+        ),
+      );
+
+    // Check if password and passwordConfirm match (This could rely on the model validator, but I chose to check here also)
+    if (req.body.newPassword !== req.body.newPasswordConfirm)
+      return next(new AppError('New passwords do not match. Please try again', 400));
+
+    // Find user on DB
+    const user = await User.findById(req.user.id).select('+password');
+
+    // Check if current password is correct for the authenticated user
+    const isPasswordCorrect = await bcrypt.compare(req.body.currentPassword, user.password);
+    if (!isPasswordCorrect)
+      return next(
+        new AppError(
+          'Your current password is incorrect. Please provide the correct current password in order to reset password',
+          400,
+        ),
+      );
+
+    // If so, update password and passwordUpdatedAt
+    user.password = req.body.newPassword;
+    user.passwordConfirm = req.body.newPasswordConfirm;
+    user.passwordUpdatedAt = Date.now() - 1000;
+    await user.save();
+
+    // Send new login token
+    createAndSendToken(200, user, res);
+  } catch (err) {
+    next(err);
+  }
+};
+
+// Test to implement: another user is loggedin, and forges a request with another user on the req.body, and tries to update the other user's password. Should not be allowed
