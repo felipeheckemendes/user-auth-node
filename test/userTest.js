@@ -374,7 +374,7 @@ describe('2. User Controller log-in', () => {
 });
 
 describe('3. User Controller is authenticated middleware', () => {
-  it('should not raise an error if the token is valid', async () => {
+  it('should not raise an error if the token is valid & user should be added to req', async () => {
     const user = {
       email: 'john@example.com',
       password: 'password123',
@@ -390,10 +390,16 @@ describe('3. User Controller is authenticated middleware', () => {
     const req = {};
     req.headers = {};
     req.headers.authorization = `Bearer ${token}`;
-    await expect(userController.isAuthenticated(req, {}, () => true)).to.be.fulfilled;
+    await expect(
+      userController.isAuthenticated(req, {}, (param) => {
+        if (param !== undefined) throw new AppError('AppError');
+      }),
+    ).to.be.fulfilled;
+    await expect(req.user).to.exist;
+    await expect(req.user.id).to.exist;
   });
 
-  it('should raise an error if the token payload has been tampered with', async () => {
+  it('should forward AppError to next() if the token payload has been tampered with', async () => {
     const user = {
       email: 'john@example.com',
       password: 'password123',
@@ -416,8 +422,128 @@ describe('3. User Controller is authenticated middleware', () => {
     const req = {};
     req.headers = {};
     req.headers.authorization = `Bearer ${newToken}`;
-    await expect(userController.isAuthenticated(req, {}, () => true)).to.be.rejectedWith(
-      'invalid signature',
-    );
+    await expect(
+      userController.isAuthenticated(req, {}, (err) => {
+        if (err !== undefined) throw err;
+      }),
+    ).to.be.rejectedWith('You are not logged in. Please log in to access this resource');
+  });
+
+  it('should forward AppError to next() if no token is sent on the header', async () => {
+    const user = {
+      email: 'john@example.com',
+      password: 'password123',
+      passwordConfirm: 'password123',
+    };
+
+    await chai.request(app).post('/api/v1/users/signup').send(user);
+
+    const res = await chai.request(app).post('/api/v1/users/login').send(user);
+    // Verify that user received token back after login
+    expect(res.body).to.have.property('token').that.is.a('string');
+    const newToken = '';
+
+    const req = {};
+    req.headers = {};
+    req.headers.authorization = `Bearer ${newToken}`;
+    await expect(
+      userController.isAuthenticated(req, {}, (err) => {
+        if (err !== undefined) throw err;
+      }),
+    ).to.be.rejectedWith('You are not logged in. Please log in to access this resource');
+  });
+
+  it('should forward AppError to next() if the user ID does not exist on the DB', async () => {
+    const user = {
+      email: 'john@example.com',
+      password: 'password123',
+      passwordConfirm: 'password123',
+    };
+
+    await chai.request(app).post('/api/v1/users/signup').send(user);
+
+    const res = await chai.request(app).post('/api/v1/users/login').send(user);
+    // Verify that user received token back after login
+    expect(res.body).to.have.property('token').that.is.a('string');
+    const { token } = res.body;
+    const payload = {
+      id: '6765c8e6a75a958e67798154', // Wrong ID
+      iat: Math.floor(Date.now() / 1000 - 10),
+      exp: Math.floor(Date.now() / 1000 + 60 * 24 * process.env.JWT_EXPIRES_DAYS),
+    };
+    const newToken = jwt.sign(payload, process.env.JWTSECRET);
+
+    const req = {};
+    req.headers = {};
+    req.headers.authorization = `Bearer ${newToken}`;
+    await expect(
+      userController.isAuthenticated(req, {}, (err) => {
+        if (err !== undefined) throw err;
+      }),
+    ).to.be.rejectedWith('You are not logged in. Please log in to access this resource');
+  });
+
+  it('should forward AppError to next() if the token is expired', async () => {
+    const user = {
+      email: 'john@example.com',
+      password: 'password123',
+      passwordConfirm: 'password123',
+    };
+
+    await chai.request(app).post('/api/v1/users/signup').send(user);
+
+    const res = await chai.request(app).post('/api/v1/users/login').send(user);
+    // Verify that user received token back after login
+    expect(res.body).to.have.property('token').that.is.a('string');
+    const { token } = res.body;
+    const payload = {
+      id: res.body.data._id,
+      iat: Math.floor(Date.now() / 1000 - 10),
+      exp: Math.floor(Date.now() / 1000 - 5), // Simulate expired token
+    };
+    const newToken = jwt.sign(payload, process.env.JWTSECRET);
+
+    const req = {};
+    req.headers = {};
+    req.headers.authorization = `Bearer ${newToken}`;
+    await expect(
+      userController.isAuthenticated(req, {}, (err) => {
+        if (err !== undefined) throw err;
+      }),
+    ).to.be.rejectedWith('You are not logged in. Please log in to access this resource');
+  });
+
+  // it('should forward AppError to next() if the token is expired', async () => {
+  // // To be implemented after update password is created
+  // });
+
+  it('should forward AppError to next() if the user ID cannot be cast', async () => {
+    const user = {
+      email: 'john@example.com',
+      password: 'password123',
+      passwordConfirm: 'password123',
+    };
+
+    await chai.request(app).post('/api/v1/users/signup').send(user);
+
+    const res = await chai.request(app).post('/api/v1/users/login').send(user);
+    // Verify that user received token back after login
+    expect(res.body).to.have.property('token').that.is.a('string');
+    const { token } = res.body;
+    const payload = {
+      id: 'wrong-id-format', // Wrong ID
+      iat: Math.floor(Date.now() / 1000 - 10),
+      exp: Math.floor(Date.now() / 1000 + 60 * 24 * process.env.JWT_EXPIRES_DAYS),
+    };
+    const newToken = jwt.sign(payload, process.env.JWTSECRET);
+
+    const req = {};
+    req.headers = {};
+    req.headers.authorization = `Bearer ${newToken}`;
+    await expect(
+      userController.isAuthenticated(req, {}, (err) => {
+        if (err !== undefined) throw err;
+      }),
+    ).to.be.rejectedWith('Cast to ObjectId failed for value');
   });
 });
