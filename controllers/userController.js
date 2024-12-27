@@ -4,6 +4,20 @@ const bcrypt = require('bcryptjs');
 const User = require('../models/userModel');
 const AppError = require('../utils/appError');
 
+function validateToken(token) {
+  try {
+    if (!token) {
+      return false; // No token provided
+    }
+
+    // Attempt to verify the token
+    jwt.verify(token, process.env.JWTSECRET);
+    return true; // Token is valid
+  } catch (error) {
+    return false; // Verification failed
+  }
+}
+
 const createAndSendToken = (statusCode, user, res) => {
   const payload = {
     id: user._id,
@@ -62,7 +76,7 @@ exports.isAuthenticated = async (req, res, next) => {
   if (req.headers.authorization && req.headers.authorization.startsWith('Bearer'))
     token = req.headers.authorization.split(' ')[1];
   // Check if JWT Bearer Token was sent on headers and is valid
-  if (!token || !jwt.verify(token, process.env.JWTSECRET))
+  if (!token || !validateToken(token))
     return next(new AppError('You are not logged in. Please log in to access this resource', 401));
   // Decode token and find user
   const tokenPayload = jwt.decode(token);
