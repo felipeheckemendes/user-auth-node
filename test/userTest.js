@@ -1,9 +1,11 @@
+/* eslint-disable no-unused-expressions */
 /* eslint-disable no-console */
 const mongoose = require('mongoose');
 const path = require('path');
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
 const chaiHttp = require('chai-http');
+const jwt = require('jsonwebtoken');
 
 chai.use(chaiAsPromised);
 chai.use(chaiHttp);
@@ -369,4 +371,53 @@ describe('2. User Controller log-in', () => {
   });
 
   // describe closing
+});
+
+describe('3. User Controller is authenticated middleware', () => {
+  it('should not raise an error if the token is valid', async () => {
+    const user = {
+      email: 'john@example.com',
+      password: 'password123',
+      passwordConfirm: 'password123',
+    };
+
+    await chai.request(app).post('/api/v1/users/signup').send(user);
+
+    const res = await chai.request(app).post('/api/v1/users/login').send(user);
+    // Verify that user received token back after login
+    expect(res.body).to.have.property('token').that.is.a('string');
+    const { token } = res.body;
+    const req = {};
+    req.headers = {};
+    req.headers.authorization = `Bearer ${token}`;
+    await expect(userController.isAuthenticated(req, {}, () => true)).to.be.fulfilled;
+  });
+
+  it('should raise an error if the token payload has been tampered with', async () => {
+    const user = {
+      email: 'john@example.com',
+      password: 'password123',
+      passwordConfirm: 'password123',
+    };
+
+    await chai.request(app).post('/api/v1/users/signup').send(user);
+
+    const res = await chai.request(app).post('/api/v1/users/login').send(user);
+    // Verify that user received token back after login
+    expect(res.body).to.have.property('token').that.is.a('string');
+    const { token } = res.body;
+    const payload = {
+      id: user._id,
+      iat: Math.floor(Date.now() / 1000 - 10),
+      exp: Math.floor(Date.now() / 1000 + 60 * 24 * process.env.JWT_EXPIRES_DAYS),
+    };
+    const newToken = jwt.sign(payload, 'wrong-secret');
+
+    const req = {};
+    req.headers = {};
+    req.headers.authorization = `Bearer ${newToken}`;
+    await expect(userController.isAuthenticated(req, {}, () => true)).to.be.rejectedWith(
+      'AppError',
+    );
+  });
 });
