@@ -10,7 +10,6 @@ This is an **ongoing** side project where I intend build a user authentication s
 - [ ] Create forgot password and password reset functionality
 - [ ] Create a getme user info functionality
 - [ ] Create a updateme to update user information such as email
-- [ ] Create password update functionality
 - [ ] Create deactivate functionality to soft delete user
 - [ ] Create user admin route and functionality (get all users, update users, permanent delete users)
 - [ ] Set up security middleware to make application robust against different kinds of attacks.
@@ -27,3 +26,4 @@ This is an **ongoing** side project where I intend build a user authentication s
 - [x] Add token response after Signup
 - [x] Add Login route and functionality
 - [x] Send jwt through cookies upon Login
+- [x] Create password update functionality

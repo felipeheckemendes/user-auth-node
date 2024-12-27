@@ -547,3 +547,175 @@ describe('3. User Controller is authenticated middleware', () => {
     ).to.be.rejectedWith('Cast to ObjectId failed for value');
   });
 });
+
+describe('4. User Route/Controller updatePassword', () => {
+  it('should receive back a success status and token if user is loggedin, currentPassword and newPasswordConfirm are correct', async () => {
+    // Create a new user
+    const user = {
+      email: 'john@example.com',
+      password: 'password123',
+      passwordConfirm: 'password123',
+    };
+    await chai.request(app).post('/api/v1/users/signup').send(user);
+    // Login new user
+    const resLogin = await chai.request(app).post('/api/v1/users/login').send(user);
+    // Send updatepassword with token on headers and body with current and new password
+    const updatePasswordBody = {
+      currentPassword: 'password123',
+      newPassword: 'newPassword123',
+      newPasswordConfirm: 'newPassword123',
+    };
+    const resUpdatePassword = await chai
+      .request(app)
+      .patch('/api/v1/users/updatePassword')
+      .set('Authorization', `Bearer ${resLogin.body.token}`)
+      .send(updatePasswordBody);
+
+    // Verify that user received token back after login
+    expect(resUpdatePassword).to.have.status(200);
+    expect(resUpdatePassword.body).to.have.property('status').that.equals('success');
+    expect(resUpdatePassword.body).to.have.property('token').that.is.a('string');
+    expect(resUpdatePassword.body).to.have.property('data');
+    expect(resUpdatePassword.body.data).to.include({
+      email: user.email,
+    });
+  });
+
+  it('if passwords do not match, should receive back a fail status and 400 error code', async () => {
+    // Create a new user
+    const user = {
+      email: 'john@example.com',
+      password: 'password123',
+      passwordConfirm: 'password123',
+    };
+    await chai.request(app).post('/api/v1/users/signup').send(user);
+    // Login new user
+    const resLogin = await chai.request(app).post('/api/v1/users/login').send(user);
+    // Send updatepassword with token on headers and body with current and new password
+    const updatePasswordBody = {
+      currentPassword: 'password123',
+      newPassword: 'newPassword123',
+      newPasswordConfirm: 'newPassword456',
+    };
+    const resUpdatePassword = await chai
+      .request(app)
+      .patch('/api/v1/users/updatePassword')
+      .set('Authorization', `Bearer ${resLogin.body.token}`)
+      .send(updatePasswordBody);
+
+    // Verify that user received token back after login
+    expect(resUpdatePassword).to.have.status(400);
+    expect(resUpdatePassword.body).to.have.property('status').that.equals('fail');
+    expect(resUpdatePassword.body).to.have.property('message');
+  });
+
+  it('if current password is incorrect, should receive back a fail status and 400 error code', async () => {
+    // Create a new user
+    const user = {
+      email: 'john@example.com',
+      password: 'password123',
+      passwordConfirm: 'password123',
+    };
+    await chai.request(app).post('/api/v1/users/signup').send(user);
+    // Login new user
+    const resLogin = await chai.request(app).post('/api/v1/users/login').send(user);
+    // Send updatepassword with token on headers and body with current and new password
+    const updatePasswordBody = {
+      currentPassword: 'incorrect-password',
+      newPassword: 'newPassword123',
+      newPasswordConfirm: 'newPassword123',
+    };
+    const resUpdatePassword = await chai
+      .request(app)
+      .patch('/api/v1/users/updatePassword')
+      .set('Authorization', `Bearer ${resLogin.body.token}`)
+      .send(updatePasswordBody);
+
+    // Verify that user received token back after login
+    expect(resUpdatePassword).to.have.status(400);
+    expect(resUpdatePassword.body).to.have.property('status').that.equals('fail');
+    expect(resUpdatePassword.body).to.have.property('message');
+  });
+
+  it('if current password is not provided, should receive back a fail status and 400 error code', async () => {
+    // Create a new user
+    const user = {
+      email: 'john@example.com',
+      password: 'password123',
+      passwordConfirm: 'password123',
+    };
+    await chai.request(app).post('/api/v1/users/signup').send(user);
+    // Login new user
+    const resLogin = await chai.request(app).post('/api/v1/users/login').send(user);
+    // Send updatepassword with token on headers and body with current and new password
+    const updatePasswordBody = {
+      newPassword: 'newPassword123',
+      newPasswordConfirm: 'newPassword123',
+    };
+    const resUpdatePassword = await chai
+      .request(app)
+      .patch('/api/v1/users/updatePassword')
+      .set('Authorization', `Bearer ${resLogin.body.token}`)
+      .send(updatePasswordBody);
+
+    // Verify that user received token back after login
+    expect(resUpdatePassword).to.have.status(400);
+    expect(resUpdatePassword.body).to.have.property('status').that.equals('fail');
+    expect(resUpdatePassword.body).to.have.property('message');
+  });
+
+  it('if password Confirm is not provided, should receive back a fail status and 400 error code', async () => {
+    // Create a new user
+    const user = {
+      email: 'john@example.com',
+      password: 'password123',
+      passwordConfirm: 'password123',
+    };
+    await chai.request(app).post('/api/v1/users/signup').send(user);
+    // Login new user
+    const resLogin = await chai.request(app).post('/api/v1/users/login').send(user);
+    // Send updatepassword with token on headers and body with current and new password
+    const updatePasswordBody = {
+      currentPassword: 'password123',
+      newPassword: 'newPassword123',
+    };
+    const resUpdatePassword = await chai
+      .request(app)
+      .patch('/api/v1/users/updatePassword')
+      .set('Authorization', `Bearer ${resLogin.body.token}`)
+      .send(updatePasswordBody);
+
+    // Verify that user received token back after login
+    expect(resUpdatePassword).to.have.status(400);
+    expect(resUpdatePassword.body).to.have.property('status').that.equals('fail');
+    expect(resUpdatePassword.body).to.have.property('message');
+  });
+
+  it('if user has been deleted, should receive back a fail status and 401 error code, because authentication cannot be completed', async () => {
+    // Create a new user
+    const user = {
+      email: 'john@example.com',
+      password: 'password123',
+      passwordConfirm: 'password123',
+    };
+    await chai.request(app).post('/api/v1/users/signup').send(user);
+    // Login new user
+    const resLogin = await chai.request(app).post('/api/v1/users/login').send(user);
+    // Send updatepassword with token on headers and body with current and new password
+    const updatePasswordBody = {
+      currentPassword: 'password123',
+      newPassword: 'newPassword123',
+    };
+    await User.deleteMany({});
+    const resUpdatePassword = await chai
+      .request(app)
+      .patch('/api/v1/users/updatePassword')
+      .set('Authorization', `Bearer ${resLogin.body.token}`)
+      .send(updatePasswordBody);
+
+    // Verify that user received token back after login
+    expect(resUpdatePassword).to.have.status(401);
+    expect(resUpdatePassword.body).to.have.property('status').that.equals('fail');
+    expect(resUpdatePassword.body).to.have.property('message');
+  });
+});
