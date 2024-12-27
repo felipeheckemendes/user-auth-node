@@ -63,20 +63,20 @@ exports.isAuthenticated = async (req, res, next) => {
     token = req.headers.authorization.split(' ')[1];
   // Check if JWT Bearer Token was sent on headers and is valid
   if (!token || !jwt.verify(token, process.env.JWTSECRET))
-    return next(new AppError('You are not logged in. Please log in to access this resource'));
+    return next(new AppError('You are not logged in. Please log in to access this resource', 401));
   // Decode token and find user
   const tokenPayload = jwt.decode(token);
   const user = await User.findById(tokenPayload.id);
   // Check if  user still exists
   if (!user)
-    return next(new AppError('You are not logged in. Please log in to access this resource'));
+    return next(new AppError('You are not logged in. Please log in to access this resource', 401));
   // Check if token has expired
   if (!tokenPayload.exp || !tokenPayload.iat || Date(tokenPayload.exp * 1000) < Date.now())
     //tokenPayload.iat is redundant, but is implemented in the odd case a token might perchance be issued without iat
-    return next(new AppError('Your login has expired. Please login again.'));
+    return next(new AppError('Your login has expired. Please login again.', 401));
   // Check if user has changed password after token issued
   if (user.passwordUpdatedAt && user.passwordUpdatedAt > Date(tokenPayload.iat * 1000))
-    return next(new AppError('You need to login again after changing your password'));
+    return next(new AppError('You need to login again after changing your password', 401));
   // If all checks have passed, add user to request, and go to next middleware
   req.user = user;
   return next();

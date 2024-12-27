@@ -407,7 +407,7 @@ describe('3. User Controller is authenticated middleware', () => {
     expect(res.body).to.have.property('token').that.is.a('string');
     const { token } = res.body;
     const payload = {
-      id: user._id,
+      id: res.body.data._id,
       iat: Math.floor(Date.now() / 1000 - 10),
       exp: Math.floor(Date.now() / 1000 + 60 * 24 * process.env.JWT_EXPIRES_DAYS),
     };
@@ -417,7 +417,7 @@ describe('3. User Controller is authenticated middleware', () => {
     req.headers = {};
     req.headers.authorization = `Bearer ${newToken}`;
     await expect(userController.isAuthenticated(req, {}, () => true)).to.be.rejectedWith(
-      'AppError',
+      'invalid signature',
     );
   });
 });
