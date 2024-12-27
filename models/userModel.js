@@ -14,8 +14,11 @@ const userSchema = new mongoose.Schema(
       match: [/^\S+@\S+\.\S+$/, 'Please enter a valid email address '],
       validate: {
         validator: async function (email) {
-          const user = await this.constructor.findOne({ email });
-          if (user !== null) return false;
+          if (this.isModified('email')) {
+            const user = await this.constructor.findOne({ email });
+            if (user !== null) return false;
+          }
+          return true;
         },
         message: 'Email already in use.',
       },
