@@ -59,8 +59,8 @@ exports.login = async (req, res, next) => {
 exports.isAuthenticated = async (req, res, next) => {
   // If authentication header is present, try to get the Bearer Token
   let token;
-  if (!req.headers.authorization && req.headers.authorization.startsWith('Bearer'))
-    token = req.headers.ahtorization.split(' ')[1];
+  if (req.headers.authorization && req.headers.authorization.startsWith('Bearer'))
+    token = req.headers.authorization.split(' ')[1];
   // Check if JWT Bearer Token was sent on headers and is valid
   if (!token || !jwt.verify(token, process.env.JWTSECRET))
     return next(new AppError('You are not logged in. Please log in to access this resource'));
@@ -79,5 +79,5 @@ exports.isAuthenticated = async (req, res, next) => {
     return next(new AppError('You need to login again after changing your password'));
   // If all checks have passed, add user to request, and go to next middleware
   req.user = user;
-  next();
+  return next();
 };
