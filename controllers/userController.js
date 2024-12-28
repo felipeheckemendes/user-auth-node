@@ -3,6 +3,8 @@ const bcrypt = require('bcryptjs');
 
 const User = require('../models/userModel');
 const AppError = require('../utils/appError');
+const sendEmail = require('../services/email/sendEmail');
+const emailTemplates = require('../services/email/emailTemplates');
 
 function validateToken(token) {
   try {
@@ -154,4 +156,55 @@ exports.updatePassword = async (req, res, next) => {
   }
 };
 
-// Test to implement: another user is loggedin, and forges a request with another user on the req.body, and tries to update the other user's password. Should not be allowed
+exports.forgotPassword = async (req, res, next) => {
+  try {
+    // Check if body is well-formed (email or cellphone)
+    if (!req.body.email && !req.body.cellphone)
+      return next(
+        new AppError('Please provide your email or cellhone in order to reset password.', 400),
+      );
+    // TODO Log reset request
+
+    // Determine reset method
+    let resetMethod;
+    if (req.body.cellphone) resetMethod = 'cellphone';
+    if (req.body.email) resetMethod = 'email';
+
+    // Try to find user on DB
+    let user;
+    if (resetMethod === 'email')
+      user = await User.findOne({ email: req.body.email }).select('+password');
+    if (resetMethod === 'cellhone')
+      user = await User.findOne({ cellphone: req.body.cellphone }).select('+password');
+
+    // If user is found, generate token
+    let token;
+    if (user) {
+      const payload = {
+        id: user._id,
+        email: user.email,
+        purpose: 'resetPasswordViaEmail',
+        key: user.password.slice(0, 6), // This allows for the token to be used only once
+      };
+      token = jwt.sign(payload, process.env.JWTSECRET, {
+        expiresIn: process.env.PASSWORD_RESET_VALID,
+      });
+
+      // Send token for each reset method
+      if (resetMethod === 'email')
+        sendEmail(emailTemplates.resetPasswordEmail(req.body.email, token));
+      if (user && resetMethod === 'cellphone') {
+        // TODO
+      }
+    }
+
+    // Send response to user
+    res.status(200).json({
+      status: 'success',
+      message:
+        'We have sent a reset token to your email/cellphone in case there is an account associated with it.',
+    });
+  } catch (err) {
+    return next(new AppError(err.message));
+  }
+};

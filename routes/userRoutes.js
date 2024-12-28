@@ -14,6 +14,10 @@ router
     .post(userController.login);
 // prettier-ignore
 router
+    .route('/forgotPassword')
+    .post(userController.forgotPassword);
+// prettier-ignore
+router
     .route('/updatePassword')
     .patch(userController.isAuthenticated, userController.updatePassword);
 
