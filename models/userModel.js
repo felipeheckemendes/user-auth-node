@@ -57,6 +57,9 @@ const userSchema = new mongoose.Schema(
         message: 'Passwords do not match',
       },
     },
+    passwordUpdatedAt: {
+      type: Date,
+    },
   },
   {
     timestamps: true,
