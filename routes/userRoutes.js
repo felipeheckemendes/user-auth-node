@@ -1,9 +1,11 @@
 const express = require('express');
 
 const userController = require('../controllers/userController');
+const sanitizers = require('../controllers/sanitizers');
 
 const router = express.Router();
 
+router.use(sanitizers.sanitizeBodyBlackList('passwordUpdatedAt'));
 // prettier-ignore
 router
     .route('/signup')
