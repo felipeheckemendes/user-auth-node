@@ -16,7 +16,7 @@ const userSchema = new mongoose.Schema(
         validator: async function (email) {
           if (this.isModified('email')) {
             const user = await this.constructor.findOne({ email });
-            if (user !== null) return false;
+            if (user) return false;
           }
           return true;
         },
@@ -34,8 +34,10 @@ const userSchema = new mongoose.Schema(
       ], // Regex validator for international numbers starting with '+'
       validate: {
         validator: async function (cellphone) {
-          const user = await this.constructor.findOne({ cellphone });
-          if (user) return false;
+          if (this.isModified('cellphone')) {
+            const user = await this.constructor.findOne({ cellphone });
+            if (user) return false;
+          }
           return true;
         },
         message: 'Cellphone already in use.',
@@ -48,7 +50,10 @@ const userSchema = new mongoose.Schema(
     },
     passwordConfirm: {
       type: String,
-      required: true,
+      required: function () {
+        // Make passwordConfirm required only when password is modified
+        return this.isModified('password');
+      },
       minLength: 8,
       validate: {
         validator: function (passwordConfirm) {
