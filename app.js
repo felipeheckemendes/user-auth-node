@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 const express = require('express');
 
+const AppError = require('./utils/appError');
 const userRouter = require('./routes/userRoutes');
 const errorController = require('./controllers/errorController');
 
@@ -14,10 +15,7 @@ app.use(express.json({ limit: '10kb' })); // Body parser
 app.use('/api/v1/users', userRouter);
 // 404 error response:
 app.all('*', (req, res, next) => {
-  res.status(404).json({
-    status: 'fail',
-    message: `Can't find ${req.originalUrl} on this server`,
-  });
+  return next(new AppError(`Can't find ${req.originalUrl} on this server`, 404));
 });
 // EXPRESS - Global error controller middleware
 app.use(errorController);
