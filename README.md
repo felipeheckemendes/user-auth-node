@@ -4,7 +4,6 @@ This is an **ongoing** side project where I intend build a user authentication s
 
 ## To-dos (project requirements)
 
-- [ ] Add global exception and rejection error handling
 - [ ] Create Logout functionality
 - [ ] Extend forgot password functionality to work for cellphones SMS also
 - [ ] Create password reset functionality
@@ -14,6 +13,7 @@ This is an **ongoing** side project where I intend build a user authentication s
 - [ ] Create user admin route and functionality (get all users, update users, permanent delete users)
 - [ ] Set up security middleware to make application robust against different kinds of attacks.
 - [ ] Log reset requests
+- [ ] Implement application restart after crashing
 
 ## More ideas to implement
 
@@ -33,3 +33,4 @@ This is an **ongoing** side project where I intend build a user authentication s
 - [x] Create password update functionality
 - [x] Create forgot password functionality for email
 - [x] Add production global error handling middleware
+- [x] Create global handling for rejections (async) and exceptions (sync) not handled by express

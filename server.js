@@ -4,6 +4,14 @@ const path = require('path');
 const dotenv = require('dotenv');
 const mongoose = require('mongoose');
 
+// EXCEPTION HANDLING FILTER: Globally handle synchronous exceptions not otherwise handled
+process.on('uncaughtException', (err) => {
+  console.error('=> UNHANDLED EXCEPTION:');
+  console.error(err.name, err.message, err);
+  process.exit(1);
+});
+
+// LOAD MAIN APPLICATION
 const app = require('./app');
 
 // CONFIGURATIONS
@@ -26,10 +34,21 @@ mongoose
     console.log('✅ Mongo DB connection successfull.\n');
   })
   .catch((err) => {
-    console.error('❌ Mongo DB connection failed:\n', err);
+    console.error('❌ Mongo DB connection failed.\n');
+    console.error(err.name, err.message);
   });
 
 // EXPRESS - Start server
-app.listen(port, () => {
+const server = app.listen(port, () => {
   console.log(`✅ Server started and running on port ${port}.\n`);
+});
+
+// REJECTION HANDLING FILTER: Globally handle asynchronous promise rejections not handled otherwise by Express
+process.on('unhandledRejection', (err) => {
+  console.error('=> UNHANDLED REJECTION:');
+  console.error(err.name, err.message, err);
+  server.close(() => {
+    console.log('=> SERVER CLOSED. Shutting down after unhandled rejection...');
+    process.exit(1);
+  });
 });
