@@ -30,5 +30,9 @@ router
 router
     .route('/me')
     .get(userController.isAuthenticated, userController.getMe);
+// prettier-ignore
+router
+    .route('/updateMe')
+    .patch(userController.isAuthenticated, userController.updateMe);
 
 module.exports = router;

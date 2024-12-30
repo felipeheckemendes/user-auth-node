@@ -293,3 +293,38 @@ exports.getMe = (req, res, next) => {
     return next(err);
   }
 };
+
+exports.updateMe = async (req, res, next) => {
+  try {
+    // Find user in DB
+    const user = await User.findById(req.user.id).select('+password');
+
+    // Compare password
+
+    // Check if password provided on request body is correct
+    if (!req.body.password || !(await bcrypt.compare(req.body.password, user.password)))
+      return next(
+        new AppError(
+          'Please provide your current password in order to update user information.',
+          400,
+        ),
+      );
+
+    // Remove password from request body
+    const data = sanitizeBlackList(req.body, ['password', 'passwordConfirm']);
+
+    // Update user
+    Object.assign(user, data);
+    const updatedUser = await user.save();
+
+    // Send response back to client
+    res.status(200).json({
+      status: 'success',
+      user: updatedUser,
+    });
+  } catch (err) {
+    return next(err);
+  }
+};
+
+// Test: pass values that are not strings

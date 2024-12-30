@@ -8,7 +8,6 @@ An **ongoing side project** focused on building a user authentication system lev
 
 - [ ] Create Logout functionality
 - [ ] Extend forgot password functionality to work for cellphones SMS also
-- [ ] Create a updateme to update user information such as email
 - [ ] Create deactivate functionality to soft delete user
 - [ ] Create user admin route and functionality (get all users, update users, permanent delete users)
 - [ ] Set up security middleware to make application robust against different kinds of attacks.
@@ -17,7 +16,7 @@ An **ongoing side project** focused on building a user authentication system lev
 
 ### More ideas to implement
 
-- [ ] Email/cellphone confirmation for signup
+- [ ] Email/cellphone confirmation for signup and email/cellphone updates
 - [ ] Two factor authentication
 - [ ] Maximum login attempts
 - [ ] Capctcha challenge
@@ -40,8 +39,12 @@ An **ongoing side project** focused on building a user authentication system lev
 - [x] Add production global error handling middleware
 - [x] Create global handling for rejections (async) and exceptions (sync) not handled by express
 - [x] Create a getme user info functionality
+- [x] Create a updateme to update user information
 
 ## Known Issues
 
 - [ ] User model cellphone match validator regex is not raising error when the cellphone number is not valid. Test "should throw a ValidationError if telephone not in international format" disabled for now
-- [ ] CreatedAt should not be allowed to be manually set by user upon signup (not upon update)
+
+## Solved issues
+
+- [x] CreatedAt should not be allowed to be manually set by user upon signup (and upon update)
