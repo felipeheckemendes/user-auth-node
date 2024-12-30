@@ -4,7 +4,6 @@ This is an **ongoing** side project where I intend build a user authentication s
 
 ## To-dos (project requirements)
 
-- [ ] Add production global error handling middleware
 - [ ] Add global exception and rejection error handling
 - [ ] Create Logout functionality
 - [ ] Extend forgot password functionality to work for cellphones SMS also
@@ -33,3 +32,4 @@ This is an **ongoing** side project where I intend build a user authentication s
 - [x] Send jwt through cookies upon Login
 - [x] Create password update functionality
 - [x] Create forgot password functionality for email
+- [x] Add production global error handling middleware

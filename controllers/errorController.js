@@ -13,10 +13,34 @@ const sendErrorDev = (err, res) => {
 };
 
 const sendErrorProd = (err, res) => {
-  if (err instanceof AppError) console.error('=> PROGRAMMING ERROR', err);
-  res.status(err.statusCode).json({
-    status: err instanceof AppError ? err.status : 'error',
-    message: err instanceof AppError ? err.message : 'Something went wrong',
+  // Sanitize expected errors. If AppError, no sanitization necessary
+  let sanitizedError;
+  if (err instanceof AppError) {
+    sanitizedError = { ...err };
+  } else if (err.name === 'CastError') {
+    sanitizedError = new AppError(`Invalid ${err.path}: ${err.value}`, 400);
+  } else if (err.code === 11000) {
+    sanitizedError = new AppError(
+      `Duplicate field value ${err.errmsg.match(/(["'])(?:(?=(\\?))\2.)*?\1/)[0]}. Please another value`,
+      400,
+    );
+  } else if (err.name === 'ValidationError') {
+    sanitizedError = new AppError(
+      `Invalid input data. ${Object.values(err.errors)
+        .map((error) => error.message)
+        .join('. ')}`,
+      400,
+    );
+  } else {
+    // If unexpected error, log to console and generate a generic message
+    console.error('=> PROGRAMMING ERROR', err);
+    sanitizedError = { status: 'error', message: 'Something went wrong', statusCode: 500 };
+  }
+
+  // Send error response to client.
+  res.status(sanitizedError.statusCode).json({
+    status: sanitizedError.status,
+    message: sanitizedError.message,
   });
 };
 
