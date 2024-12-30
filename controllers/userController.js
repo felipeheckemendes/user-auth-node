@@ -206,82 +206,90 @@ exports.forgotPassword = async (req, res, next) => {
         'We have sent a reset token to your email/cellphone in case there is an account associated with it.',
     });
   } catch (err) {
-    return next(new AppError(err.message));
+    return next(err);
   }
 };
 
 exports.resetPassword = async (req, res, next) => {
-  // Check if body is well-formed (newPassword and newPasswordConfirm)
-  if (!req.body.newPassword || !req.body.newPasswordConfirm || !req.body.token)
-    return next(
-      new AppError(
-        'Please provide "newPassword", "newPasswordConfirm" and "token" to reset password.',
-        400,
-      ),
-    );
+  try {
+    // Check if body is well-formed (newPassword and newPasswordConfirm)
+    if (!req.body.newPassword || !req.body.newPasswordConfirm || !req.body.token)
+      return next(
+        new AppError(
+          'Please provide "newPassword", "newPasswordConfirm" and "token" to reset password.',
+          400,
+        ),
+      );
 
-  // Validate token
-  if (!validateToken(req.body.token))
-    return next(
-      new AppError(
-        'This token is no longer valid. Please generate a new forgot password request.',
-        400,
-      ),
-    );
+    // Validate token
+    if (!validateToken(req.body.token))
+      return next(
+        new AppError(
+          'This token is no longer valid. Please generate a new forgot password request.',
+          400,
+        ),
+      );
 
-  // Decode token
-  const { id, purpose, key } = jwt.decode(req.body.token);
+    // Decode token
+    const { id, purpose, key } = jwt.decode(req.body.token);
 
-  // Check if it is a password reset token
-  if (purpose !== 'resetPasswordViaEmail' || !key || !id)
-    return next(
-      new AppError(
-        'The token provided is not intended for password reset. Please provide a valid token to reset password.',
-        400,
-      ),
-    );
+    // Check if it is a password reset token
+    if (purpose !== 'resetPasswordViaEmail' || !key || !id)
+      return next(
+        new AppError(
+          'The token provided is not intended for password reset. Please provide a valid token to reset password.',
+          400,
+        ),
+      );
 
-  // Check if user still exists
-  const user = await User.findById(id).select('+password');
-  if (!user)
-    return next(
-      new AppError('The user requested does not exist: not possible to reset password', 400),
-    );
+    // Check if user still exists
+    const user = await User.findById(id).select('+password');
+    if (!user)
+      return next(
+        new AppError('The user requested does not exist: not possible to reset password', 400),
+      );
 
-  // Check if token is still valid (that is, if password has not been changed since it was issued)
-  if (key !== user.password.slice(0, 12))
-    return next(
-      new AppError(
-        'This token is no longer valid. Please generate a new forgot password request.',
-        400,
-      ),
-    );
+    // Check if token is still valid (that is, if password has not been changed since it was issued)
+    if (key !== user.password.slice(0, 12))
+      return next(
+        new AppError(
+          'This token is no longer valid. Please generate a new forgot password request.',
+          400,
+        ),
+      );
 
-  // Check if passwords match
-  if (req.body.newPassword !== req.body.newPasswordConfirm)
-    return next(new AppError('New passwords do not match. Please try agaain.', 400));
+    // Check if passwords match
+    if (req.body.newPassword !== req.body.newPasswordConfirm)
+      return next(new AppError('New passwords do not match. Please try agaain.', 400));
 
-  // If so, update password and passwordUpdatedAt
-  user.password = req.body.newPassword;
-  user.passwordConfirm = req.body.newPasswordConfirm;
-  user.passwordUpdatedAt = Date.now() - 1000;
-  await user.save();
+    // If so, update password and passwordUpdatedAt
+    user.password = req.body.newPassword;
+    user.passwordConfirm = req.body.newPasswordConfirm;
+    user.passwordUpdatedAt = Date.now() - 1000;
+    await user.save();
 
-  // Send new login token
-  createAndSendToken(200, user, res);
+    // Send new login token
+    createAndSendToken(200, user, res);
+  } catch (err) {
+    return next(err);
+  }
 };
 
 exports.getMe = (req, res, next) => {
-  if (!req.user) return next(new AppError('You are not logged in', 400)); // This line is redundant because of the isAuthenticated middleware
-  const sanitizedUser = sanitizeBlackList(req.user._doc, [
-    '_id',
-    'password',
-    'passwordConfirm',
-    'passwordUpdatedAt',
-    'updatedAt',
-  ]);
-  res.status(200).json({
-    status: 'success',
-    data: sanitizedUser,
-  });
+  try {
+    if (!req.user) return next(new AppError('You are not logged in', 400)); // This line is redundant because of the isAuthenticated middleware
+    const sanitizedUser = sanitizeBlackList(req.user._doc, [
+      '_id',
+      'password',
+      'passwordConfirm',
+      'passwordUpdatedAt',
+      'updatedAt',
+    ]);
+    res.status(200).json({
+      status: 'success',
+      data: sanitizedUser,
+    });
+  } catch (err) {
+    return next(err);
+  }
 };
