@@ -8,6 +8,8 @@ const sanitizeBlackList = (object, forbiddenFields) => {
   return sanitizedObject;
 };
 
+exports.sanitizeBlackList = sanitizeBlackList;
+
 exports.sanitizeBodyBlackList = (...forbiddenFields) => {
   return async (req, res, next) => {
     req.body = sanitizeBlackList(req.body, forbiddenFields);
@@ -24,6 +26,8 @@ const sanitizeWhiteList = (object, allowedFields) => {
   });
   return sanitizedObject;
 };
+
+exports.sanitizeWhiteList = sanitizeWhiteList;
 
 exports.sanitizeBodyWhiteList = (...allowedFields) => {
   return async (req, res, next) => {

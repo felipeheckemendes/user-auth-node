@@ -5,6 +5,7 @@ const User = require('../models/userModel');
 const AppError = require('../utils/appError');
 const sendEmail = require('../services/email/sendEmail');
 const emailTemplates = require('../services/email/emailTemplates');
+const { sanitizeBlackList } = require('./sanitizers');
 
 function validateToken(token) {
   try {
@@ -268,4 +269,19 @@ exports.resetPassword = async (req, res, next) => {
 
   // Send new login token
   createAndSendToken(200, user, res);
+};
+
+exports.getMe = (req, res, next) => {
+  if (!req.user) return next(new AppError('You are not logged in', 400)); // This line is redundant because of the isAuthenticated middleware
+  const sanitizedUser = sanitizeBlackList(req.user._doc, [
+    '_id',
+    'password',
+    'passwordConfirm',
+    'passwordUpdatedAt',
+    'updatedAt',
+  ]);
+  res.status(200).json({
+    status: 'success',
+    data: sanitizedUser,
+  });
 };

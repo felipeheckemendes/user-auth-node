@@ -26,5 +26,9 @@ router
 router
     .route('/updatePassword')
     .patch(userController.isAuthenticated, userController.updatePassword);
+// prettier-ignore
+router
+    .route('/me')
+    .get(userController.isAuthenticated, userController.getMe);
 
 module.exports = router;
