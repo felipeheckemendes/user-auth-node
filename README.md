@@ -1,13 +1,13 @@
 # User Authentication using Express, Mongoose and JWT
 
-This is an **ongoing** side project where I intend build a user authentication system using Node.js, Express, JWT and MongoDB.
+An **ongoing side project** focused on building a user authentication system leveraging Node.js, Express, JWT, and MongoDB/Mongoose.
 
-## To-dos (project requirements)
+## Project progress
+
+### To-dos (project requirements)
 
 - [ ] Create Logout functionality
 - [ ] Extend forgot password functionality to work for cellphones SMS also
-- [ ] Create password reset functionality
-- [ ] Create a getme user info functionality
 - [ ] Create a updateme to update user information such as email
 - [ ] Create deactivate functionality to soft delete user
 - [ ] Create user admin route and functionality (get all users, update users, permanent delete users)
@@ -15,7 +15,7 @@ This is an **ongoing** side project where I intend build a user authentication s
 - [ ] Log reset requests
 - [ ] Implement application restart after crashing
 
-## More ideas to implement
+### More ideas to implement
 
 - [ ] Email/cellphone confirmation for signup
 - [ ] Two factor authentication
@@ -23,7 +23,11 @@ This is an **ongoing** side project where I intend build a user authentication s
 - [ ] Capctcha challenge
 - [ ] Rate limiting and other security measures
 
-## Done
+### Tests pending
+
+- [ ] Test forgot and reset password
+
+### Done
 
 - [x] Create a basic Sign-up functionality
 - [x] Add development global error handling middleware
@@ -32,5 +36,12 @@ This is an **ongoing** side project where I intend build a user authentication s
 - [x] Send jwt through cookies upon Login
 - [x] Create password update functionality
 - [x] Create forgot password functionality for email
+- [x] Create password reset functionality
 - [x] Add production global error handling middleware
 - [x] Create global handling for rejections (async) and exceptions (sync) not handled by express
+- [x] Create a getme user info functionality
+
+## Known Issues
+
+- [ ] User model cellphone match validator regex is not raising error when the cellphone number is not valid. Test "should throw a ValidationError if telephone not in international format" disabled for now
+- [ ] CreatedAt should not be allowed to be manually set by user upon signup (not upon update)
