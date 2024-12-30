@@ -184,7 +184,7 @@ exports.forgotPassword = async (req, res, next) => {
         id: user._id,
         email: user.email,
         purpose: 'resetPasswordViaEmail',
-        key: user.password.slice(0, 6), // This allows for the token to be used only once
+        key: user.password.slice(0, 12), // This allows for the token to be used only once
       };
       token = jwt.sign(payload, process.env.JWTSECRET, {
         expiresIn: process.env.PASSWORD_RESET_VALID,
@@ -207,4 +207,65 @@ exports.forgotPassword = async (req, res, next) => {
   } catch (err) {
     return next(new AppError(err.message));
   }
+};
+
+exports.resetPassword = async (req, res, next) => {
+  // Check if body is well-formed (newPassword and newPasswordConfirm)
+  if (!req.body.newPassword || !req.body.newPasswordConfirm || !req.body.token)
+    return next(
+      new AppError(
+        'Please provide "newPassword", "newPasswordConfirm" and "token" to reset password.',
+        400,
+      ),
+    );
+
+  // Validate token
+  if (!validateToken(req.body.token))
+    return next(
+      new AppError(
+        'This token is no longer valid. Please generate a new forgot password request.',
+        400,
+      ),
+    );
+
+  // Decode token
+  const { id, purpose, key } = jwt.decode(req.body.token);
+
+  // Check if it is a password reset token
+  if (purpose !== 'resetPasswordViaEmail' || !key || !id)
+    return next(
+      new AppError(
+        'The token provided is not intended for password reset. Please provide a valid token to reset password.',
+        400,
+      ),
+    );
+
+  // Check if user still exists
+  const user = await User.findById(id).select('+password');
+  if (!user)
+    return next(
+      new AppError('The user requested does not exist: not possible to reset password', 400),
+    );
+
+  // Check if token is still valid (that is, if password has not been changed since it was issued)
+  if (key !== user.password.slice(0, 12))
+    return next(
+      new AppError(
+        'This token is no longer valid. Please generate a new forgot password request.',
+        400,
+      ),
+    );
+
+  // Check if passwords match
+  if (req.body.newPassword !== req.body.newPasswordConfirm)
+    return next(new AppError('New passwords do not match. Please try agaain.', 400));
+
+  // If so, update password and passwordUpdatedAt
+  user.password = req.body.newPassword;
+  user.passwordConfirm = req.body.newPasswordConfirm;
+  user.passwordUpdatedAt = Date.now() - 1000;
+  await user.save();
+
+  // Send new login token
+  createAndSendToken(200, user, res);
 };
