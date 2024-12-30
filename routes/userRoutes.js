@@ -5,7 +5,7 @@ const sanitizers = require('../controllers/sanitizers');
 
 const router = express.Router();
 
-router.use(sanitizers.sanitizeBodyBlackList('passwordUpdatedAt'));
+router.use(sanitizers.sanitizeBodyBlackList('passwordUpdatedAt', 'createdAt', 'updatedAt'));
 // prettier-ignore
 router
     .route('/signup')
