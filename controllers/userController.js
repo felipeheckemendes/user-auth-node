@@ -129,6 +129,15 @@ exports.isAuthenticated = async (req, res, next) => {
   }
 };
 
+exports.restrictTo = function (req, res, next) {
+  return (...allowedRoles) => {
+    // Check if user is not authorized
+    if (!allowedRoles.contains(req.user.role))
+      return next(new AppError('You do not have permission to perform this action.', 403));
+    return next();
+  };
+};
+
 exports.updatePassword = async (req, res, next) => {
   try {
     // Check if request body is well-formed

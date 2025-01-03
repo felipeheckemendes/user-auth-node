@@ -13,6 +13,7 @@ router.use(
     'isActive',
     '__v',
     '_id',
+    'role',
   ),
 );
 // prettier-ignore
