@@ -8,7 +8,6 @@ An **ongoing side project** focused on building a user authentication system lev
 
 - [ ] Create Logout functionality
 - [ ] Extend forgot password functionality to work for cellphones SMS also
-- [ ] Create deactivate functionality to soft delete user
 - [ ] Create user admin route and functionality (get all users, update users, permanent delete users)
 - [ ] Set up security middleware to make application robust against different kinds of attacks.
 - [ ] Log reset requests
@@ -25,6 +24,8 @@ An **ongoing side project** focused on building a user authentication system lev
 ### Tests pending
 
 - [ ] Test forgot and reset password
+- [ ] Test getme and updateme routes
+- [ ] Test deactivation/reactivation
 
 ### Done
 
@@ -40,6 +41,7 @@ An **ongoing side project** focused on building a user authentication system lev
 - [x] Create global handling for rejections (async) and exceptions (sync) not handled by express
 - [x] Create a getme user info functionality
 - [x] Create a updateme to update user information
+- [x] Create deactivate functionality to soft delete user
 
 ## Known Issues
 
