@@ -5,7 +5,9 @@ const sanitizers = require('../controllers/sanitizers');
 
 const router = express.Router();
 
-router.use(sanitizers.sanitizeBodyBlackList('passwordUpdatedAt', 'createdAt', 'updatedAt'));
+router.use(
+  sanitizers.sanitizeBodyBlackList('passwordUpdatedAt', 'createdAt', 'updatedAt', 'isActive'),
+);
 // prettier-ignore
 router
     .route('/signup')
@@ -34,5 +36,9 @@ router
 router
     .route('/updateMe')
     .patch(userController.isAuthenticated, userController.updateMe);
+// prettier-ignore
+router
+    .route('/deactivateMe')
+    .patch(userController.isAuthenticated, userController.deactivateMe);
 
 module.exports = router;

@@ -74,6 +74,14 @@ exports.login = async (req, res, next) => {
       const errMessage = 'Email/cellphone or password are not valid. Please try again.';
       return next(new AppError(errMessage, 400));
     }
+    // Check if user is active
+    if (!user.isActive)
+      return next(
+        new AppError(
+          'Account deactivated. PATCH a request to /reactivateMe to reactivate it.',
+          403,
+        ),
+      );
     // Send JWT token back to user
     createAndSendToken(201, user, res);
   } catch (err) {
@@ -96,7 +104,7 @@ exports.isAuthenticated = async (req, res, next) => {
     const tokenPayload = jwt.decode(token);
     const user = await User.findById(tokenPayload.id);
     // Check if  user still exists
-    if (!user)
+    if (!user || !user.isActive)
       return next(
         new AppError('You are not logged in. Please log in to access this resource', 401),
       );
@@ -269,7 +277,13 @@ exports.resetPassword = async (req, res, next) => {
     await user.save();
 
     // Send new login token
-    createAndSendToken(200, user, res);
+    if (!user.isActive)
+      res.status(200).json({
+        status: 'success',
+        message:
+          'Password reset succesfull, but account is deactivated. To reactivate send a PATCH request to /reactivateMe.',
+      });
+    else createAndSendToken(200, user, res);
   } catch (err) {
     return next(err);
   }
@@ -321,6 +335,34 @@ exports.updateMe = async (req, res, next) => {
     res.status(200).json({
       status: 'success',
       user: updatedUser,
+    });
+  } catch (err) {
+    return next(err);
+  }
+};
+
+exports.deactivateMe = async (req, res, next) => {
+  try {
+    // Find user in DB
+    const user = await User.findById(req.user.id).select('+password');
+
+    // Check if password provided on request body is correct
+    if (!req.body.password || !(await bcrypt.compare(req.body.password, user.password)))
+      return next(
+        new AppError(
+          'Please provide your current password in order to update user information.',
+          400,
+        ),
+      );
+
+    // Update user
+    user.isActive = false;
+    const updatedUser = await user.save();
+
+    // Send response back to client
+    res.status(204).json({
+      status: 'success',
+      data: updatedUser,
     });
   } catch (err) {
     return next(err);
