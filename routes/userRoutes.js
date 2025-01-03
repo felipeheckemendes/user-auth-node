@@ -6,7 +6,14 @@ const sanitizers = require('../controllers/sanitizers');
 const router = express.Router();
 
 router.use(
-  sanitizers.sanitizeBodyBlackList('passwordUpdatedAt', 'createdAt', 'updatedAt', 'isActive'),
+  sanitizers.sanitizeBodyBlackList(
+    'passwordUpdatedAt',
+    'createdAt',
+    'updatedAt',
+    'isActive',
+    '__v',
+    '_id',
+  ),
 );
 // prettier-ignore
 router

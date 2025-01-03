@@ -35,10 +35,18 @@ const createAndSendToken = (statusCode, user, res) => {
   cookieOptions.secure = process.env.NODE_ENV !== 'development'; // Cookie is sent only on https if not in production
 
   res.cookie('jwt', token, cookieOptions);
+  const sanitizedUser = sanitizeBlackList(user._doc, [
+    '_id',
+    'password',
+    'passwordConfirm',
+    'passwordUpdatedAt',
+    'updatedAt',
+    '__v',
+  ]);
   res.status(statusCode).json({
     status: 'success',
     token: token,
-    data: user,
+    data: sanitizedUser,
   });
 };
 
