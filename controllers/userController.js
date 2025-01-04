@@ -378,4 +378,76 @@ exports.deactivateMe = async (req, res, next) => {
   }
 };
 
+exports.getUsers = async (req, res, next) => {
+  try {
+    const users = await User.find().select('-password');
+    res.status(200).json({
+      status: 'success',
+      data: users,
+    });
+  } catch (err) {
+    return next(err);
+  }
+};
+
+exports.getUserById = async (req, res, next) => {
+  try {
+    // Try to find user
+    const user = await User.findById(req.params.id).select('-password');
+    // Check if there is any user with provided Id
+    if (!user) return next(new AppError('No user found with provided Id. Please try again.'));
+    // Send response to client
+    res.status(200).json({
+      status: 'success',
+      data: user,
+    });
+  } catch (err) {
+    return next(err);
+  }
+};
+
+exports.createUser = async (req, res, next) => {
+  try {
+    const user = await User.create(req.body);
+  } catch (err) {
+    return next(err);
+  }
+};
+
+exports.updateUser = async (req, res, next) => {
+  try {
+    // Try to find user
+    const user = await User.findById(req.params.id);
+    // Check if there is any user with provided Id
+    if (!user) return next(new AppError('No user found with provided Id. Please try again.'));
+    // Asign body to user and save
+    Object.assign(user, req.body);
+    const updatedUser = await user.save();
+    // Send response to client
+    res.status(200).json({
+      status: 'success',
+      data: updatedUser,
+    });
+  } catch (err) {
+    return next(err);
+  }
+};
+
+exports.deleteUser = async (req, res, next) => {
+  try {
+    // Try to find user
+    const deletedUser = await User.findByIdAndDelete(req.params.id);
+    // Check if there is any user with provided Id
+    if (!deletedUser)
+      return next(new AppError('No user found with provided Id. Please try again.'));
+    // Send response to client
+    res.status(200).json({
+      status: 'success',
+      data: deletedUser,
+    });
+  } catch (err) {
+    return next(err);
+  }
+};
+
 // Test: pass values that are not strings

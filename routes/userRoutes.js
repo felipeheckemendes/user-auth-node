@@ -1,4 +1,3 @@
-// prettier-ignore
 const express = require('express');
 
 const userController = require('../controllers/userController');
@@ -27,5 +26,14 @@ router.route('/updatePassword').patch(sanitizeUser, userController.updatePasswor
 router.route('/me').get(sanitizeUser, userController.getMe);
 router.route('/updateMe').patch(sanitizeUser, userController.updateMe);
 router.route('/deactivateMe').patch(sanitizeUser, userController.deactivateMe);
+
+// ADMIN ROUTES
+router.use(userController.isAuthenticated, userController.restrictTo('admin'), sanitizeAdmin);
+router.get('/', userController.getUsers);
+router.route('/:id')
+      .get(sanitizeAdmin, userController.getUserById)
+      .post(sanitizeAdmin, userController.createUser)
+      .patch(sanitizeAdmin, userController.updateUser)
+      .delete(sanitizeAdmin, userController.deleteUser);
 
 module.exports = router;
