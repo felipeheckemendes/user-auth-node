@@ -1,3 +1,4 @@
+// prettier-ignore
 const express = require('express');
 
 const userController = require('../controllers/userController');
@@ -5,48 +6,26 @@ const sanitizers = require('../controllers/sanitizers');
 
 const router = express.Router();
 
-router.use(
-  sanitizers.sanitizeBodyBlackList(
-    'passwordUpdatedAt',
-    'createdAt',
-    'updatedAt',
-    'isActive',
-    '__v',
-    '_id',
-    'role',
-  ),
+const sanitizeUser = sanitizers.sanitizeBodyBlackList(
+  'passwordUpdatedAt', 'createdAt', 'updatedAt', 
+  'isActive', '__v', '_id', 'role',
 );
-// prettier-ignore
-router
-    .route('/signup')
-    .post(userController.signup);
-// prettier-ignore
-router
-    .route('/login')
-    .post(userController.login);
-// prettier-ignore
-router
-    .route('/forgotPassword')
-    .post(userController.forgotPassword);
-// prettier-ignore
-router
-    .route('/resetPassword')
-    .patch(userController.resetPassword);
-// prettier-ignore
-router
-    .route('/updatePassword')
-    .patch(userController.isAuthenticated, userController.updatePassword);
-// prettier-ignore
-router
-    .route('/me')
-    .get(userController.isAuthenticated, userController.getMe);
-// prettier-ignore
-router
-    .route('/updateMe')
-    .patch(userController.isAuthenticated, userController.updateMe);
-// prettier-ignore
-router
-    .route('/deactivateMe')
-    .patch(userController.isAuthenticated, userController.deactivateMe);
+const sanitizeAdmin = sanitizers.sanitizeBodyBlackList(
+  'passwordUpdatedAt', 'createdAt', 'updatedAt',
+  'isActive', '__v', '_id',
+);
+
+// UNAUTHENTICATED ROUTES
+router.post('/signup', sanitizeUser, userController.signup);
+router.post('/login', sanitizeUser, userController.login);
+router.post('/forgotPassword', sanitizeUser, userController.forgotPassword);
+router.patch('/resetPassword', sanitizeUser, userController.resetPassword);
+
+// AUTHENTICATED ROUTES
+router.use(userController.isAuthenticated);
+router.route('/updatePassword').patch(sanitizeUser, userController.updatePassword);
+router.route('/me').get(sanitizeUser, userController.getMe);
+router.route('/updateMe').patch(sanitizeUser, userController.updateMe);
+router.route('/deactivateMe').patch(sanitizeUser, userController.deactivateMe);
 
 module.exports = router;
