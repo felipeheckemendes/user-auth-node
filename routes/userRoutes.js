@@ -1,10 +1,12 @@
 const express = require('express');
+const rateLimit = require('express-rate-limit');
 
 const userController = require('../controllers/userController');
 const sanitizers = require('../controllers/sanitizers');
 
 const router = express.Router();
 
+// CONFIGURATIONS
 const sanitizeUser = sanitizers.sanitizeBodyBlackList(
   'passwordUpdatedAt', 'createdAt', 'updatedAt', 
   'isActive', '__v', '_id', 'role',
@@ -13,10 +15,18 @@ const sanitizeAdmin = sanitizers.sanitizeBodyBlackList(
   'passwordUpdatedAt', 'createdAt', 'updatedAt',
   'isActive', '__v', '_id',
 );
+const rateLimitLogin = rateLimit({
+  max: 10,
+  windowMs: 60 * 60 * 100, // 60 minutes
+  statusCode: 400,
+  message: {
+    status: 'fail',
+    message:"You have exceeded maximum login attemps. Please try again in one hour."}
+})
 
 // UNAUTHENTICATED ROUTES
 router.post('/signup', sanitizeUser, userController.signup);
-router.post('/login', sanitizeUser, userController.login);
+router.post('/login', sanitizeUser, rateLimitLogin, userController.login);
 router.post('/forgotPassword', sanitizeUser, userController.forgotPassword);
 router.patch('/resetPassword', sanitizeUser, userController.resetPassword);
 
