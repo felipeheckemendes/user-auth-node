@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 const process = require('process');
 const AppError = require('../utils/appError');
+const logger = require('../services/logger/logger');
 
 // HELPER FUNCTIONS
 const sendErrorDev = (err, res) => {
@@ -49,6 +50,9 @@ module.exports = (err, req, res, next) => {
   err.statusCode = err.statusCode || 500;
   err.status = err.status || 'error';
   err.message = err.message || 'Something went wrong';
+  logger.error(
+    `MESSAGE[${err.message}] STATUS[${err.status}] STATUSCODE[${err.statusCode}] STACK[${err.stack}]`,
+  );
   if (process.env.NODE_ENV === 'development') sendErrorDev(err, res);
   else sendErrorProd(err, res);
 };

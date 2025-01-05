@@ -8,7 +8,6 @@ An **ongoing side project** focused on building a user authentication system lev
 
 - [ ] Create Logout functionality
 - [ ] Extend forgot password functionality to work for cellphones SMS also
-- [ ] Log reset requests
 - [ ] Implement application restart after crashing
 
 ### More ideas to implement
@@ -16,7 +15,6 @@ An **ongoing side project** focused on building a user authentication system lev
 - [ ] Email/cellphone confirmation for signup and email/cellphone updates
 - [ ] Two factor authentication
 - [ ] Capctcha challenge
-- [ ] Rate limiting and other security measures
 
 ### Tests pending
 
@@ -41,6 +39,7 @@ An **ongoing side project** focused on building a user authentication system lev
 - [x] Create deactivate functionality to soft delete user
 - [x] Create user admin route and functionality (get all users, update users, permanent delete users)
 - [x] Set up security middleware to make application robust against different kinds of attacks.
+- [x] Rate limiting and other security measures
 - [x] Log reset requests
 - [x] Maximum login attempts
 

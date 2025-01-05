@@ -3,11 +3,13 @@ const process = require('process');
 const path = require('path');
 const dotenv = require('dotenv');
 const mongoose = require('mongoose');
+const logger = require('./services/logger/logger');
 
 // EXCEPTION HANDLING FILTER: Globally handle synchronous exceptions not otherwise handled
 process.on('uncaughtException', (err) => {
   console.error('=> UNHANDLED EXCEPTION:');
   console.error(err.name, err.message, err);
+  logger.error(`Unhandled exception: NAME[${err.name}] MESSAGE[${err.message}]`);
   process.exit(1);
 });
 
@@ -47,6 +49,7 @@ const server = app.listen(port, () => {
 process.on('unhandledRejection', (err) => {
   console.error('=> UNHANDLED REJECTION:');
   console.error(err.name, err.message, err);
+  logger.error(`Unhandled rejection: NAME[${err.name}] MESSAGE[${err.message}]`);
   server.close(() => {
     console.log('=> SERVER CLOSED. Shutting down after unhandled rejection...');
     process.exit(1);
