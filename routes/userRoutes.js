@@ -3,7 +3,7 @@ const rateLimit = require('express-rate-limit');
 
 const userController = require('../controllers/userController');
 const sanitizers = require('../controllers/sanitizers');
-const logger = require('../services/logger/logger');
+const logger = require('../services/logger');
 
 const router = express.Router();
 

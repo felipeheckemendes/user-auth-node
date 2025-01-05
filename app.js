@@ -6,8 +6,8 @@ const rateLimit = require('express-rate-limit');
 const mongoSanitize = require('express-mongo-sanitize');
 const hpp = require('hpp');
 
-const xssCleaner = require('./services/xssCleaner/xssCleaner');
-const AppError = require('./utils/appError');
+const xssCleaner = require('./services/xssCleaner');
+const AppError = require('./services/appError');
 const userRouter = require('./routes/userRoutes');
 const errorController = require('./controllers/errorController');
 

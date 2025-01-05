@@ -3,7 +3,7 @@ const process = require('process');
 const path = require('path');
 const dotenv = require('dotenv');
 const mongoose = require('mongoose');
-const logger = require('./services/logger/logger');
+const logger = require('./services/logger');
 
 // EXCEPTION HANDLING FILTER: Globally handle synchronous exceptions not otherwise handled
 process.on('uncaughtException', (err) => {

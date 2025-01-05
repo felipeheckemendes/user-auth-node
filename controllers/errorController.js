@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 const process = require('process');
-const AppError = require('../utils/appError');
-const logger = require('../services/logger/logger');
+const AppError = require('../services/appError');
+const logger = require('../services/logger');
 
 // HELPER FUNCTIONS
 const sendErrorDev = (err, res) => {
