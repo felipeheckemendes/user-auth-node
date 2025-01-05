@@ -3,6 +3,7 @@ const rateLimit = require('express-rate-limit');
 
 const userController = require('../controllers/userController');
 const sanitizers = require('../controllers/sanitizers');
+const logger = require('../services/logger/logger');
 
 const router = express.Router();
 
@@ -23,11 +24,15 @@ const rateLimitLogin = rateLimit({
     status: 'fail',
     message:"You have exceeded maximum login attemps. Please try again in one hour."}
 })
+const accessLogger = (req, res, next) => {
+  logger.info(`ACCESS REQUEST IP[${req.ip}] URL[${req.originalUrl}] EMAIL[${req.body.email}]`);
+  next()
+}
 
 // UNAUTHENTICATED ROUTES
 router.post('/signup', sanitizeUser, userController.signup);
 router.post('/login', sanitizeUser, rateLimitLogin, userController.login);
-router.post('/forgotPassword', sanitizeUser, userController.forgotPassword);
+router.post('/forgotPassword', accessLogger, sanitizeUser, userController.forgotPassword);
 router.patch('/resetPassword', sanitizeUser, userController.resetPassword);
 
 // AUTHENTICATED ROUTES

@@ -4,3 +4,4 @@
 /.env
 .eslintrc.json
 .prettierignore
+*.log
