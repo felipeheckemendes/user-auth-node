@@ -8,7 +8,7 @@ export default function Layout() {
   return (
     <>
       <Header />
-      <div className="bg-blue-200 min-h-svh">
+      <div className="min-h-svh">
         <Outlet />
       </div>
       <Footer />
