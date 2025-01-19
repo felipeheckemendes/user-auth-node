@@ -4,11 +4,13 @@ import { createRoutesFromElements, createBrowserRouter, Route, RouterProvider } 
 import './App.css';
 // Components
 import Layout from './components/Layout';
+// Pages
+import Home from './pages/Home';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<Layout />}>
-      <Route index element={<h2>MAIN CONTENT HERE</h2>} />
+      <Route index element={<Home />} />
     </Route>,
   ),
 );
