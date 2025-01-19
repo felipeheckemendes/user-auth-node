@@ -6,7 +6,7 @@ import linkedin from '@/assets/linkedin.svg';
 export default function Footer() {
   return (
     <>
-      <div className="bg-gray-900 text-blue-200 h-48 flex items-center justify-center space-x-16">
+      <div className="bg-gray-950 text-blue-300 h-48 flex items-center justify-center space-x-16">
         <div>
           <p className="text-lg">Developed by Felipe Hecke</p>
           <p></p>

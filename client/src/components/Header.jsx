@@ -1,5 +1,5 @@
 // Libraries
-import { NavLink } from 'react-router';
+import { Link, NavLink } from 'react-router';
 // Assets
 import logo from '@/assets/logo.svg';
 import avatarIcon from '@/assets/avatar.svg';
@@ -20,24 +20,27 @@ export default function Header() {
   return (
     <>
       <div className="h-10 flex justify-center items-center bg-blue-950 text-white py-10 px-0 md:px-8">
-        <div className="h-10 w-full xl:w-8/12 2xl:w-7/12 flex justify-between">
-          <div className="flex items-center flex-1">
+        <div className="h-10 w-full lg:w-10/12 xl:w-9/12 3xl:w-7/12 flex justify-between">
+          <Link className="flex items-center flex-1">
             <img src={logo} className="max-h-10 mr-2" />
             <p className="font-sans text-xl font-bold pr-4">MyNodeAuth</p>
-          </div>
+          </Link>
           <NavigationMenu className="relative">
             <NavigationMenuList>
               <NavigationMenuItem>
                 <NavLink
                   to="contact"
-                  className={navigationMenuTriggerStyle() + ' border-2 bg-indigo-400'}
+                  className={
+                    navigationMenuTriggerStyle() +
+                    ' bg-indigo-400 text-white border-slate-100 border-2'
+                  }
                 >
                   Contact Me
                 </NavLink>
               </NavigationMenuItem>
 
               <NavigationMenuItem>
-                <NavLink to="docs" className={navigationMenuTriggerStyle()}>
+                <NavLink to="about" className={navigationMenuTriggerStyle()}>
                   About
                 </NavLink>
               </NavigationMenuItem>
