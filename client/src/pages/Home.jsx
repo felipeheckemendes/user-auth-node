@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 export default function Home() {
   return (
     <>
-      <div className=" w-full lg:w-10/12 xl:w-9/12 3xl:w-7/12 p-24 flex justify-center space-x-24">
+      <div className="flex p-32 space-x-24">
         <div className="w-6/12 space-y-4 text-left">
           <p className=" font-tinos text-5xl">
             A Token-Based <span className="whitespace-nowrap">Authentication API.</span>

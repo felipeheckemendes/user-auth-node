@@ -6,15 +6,14 @@ import { Label } from '@/components/ui/label';
 import { Link } from 'react-router';
 
 export default function LoginForm({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
-  console.log('Here');
   return (
     <div className={cn('flex flex-col gap-6 mt-24', className)} {...props}>
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl">Sign up</CardTitle>
+          <CardTitle className="text-2xl">Forgot your password?</CardTitle>
           <CardDescription>
-            <p>Enter your email below to reset your password.</p>
-            <p>We will send you a reset token.</p>
+            <p>Enter your email below.</p>
+            <p>We will send you a reset link.</p>
           </CardDescription>
         </CardHeader>
         <CardContent>

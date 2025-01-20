@@ -6,7 +6,6 @@ import { Label } from '@/components/ui/label';
 import { Link } from 'react-router';
 
 export default function LoginForm({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
-  console.log('Here');
   return (
     <div className={cn('flex flex-col gap-6 mt-24', className)} {...props}>
       <Card>

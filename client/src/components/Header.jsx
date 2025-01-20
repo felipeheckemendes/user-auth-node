@@ -46,8 +46,14 @@ export default function Header() {
               </NavigationMenuItem>
 
               <NavigationMenuItem>
-                <NavLink to="login" className={navigationMenuTriggerStyle()}>
+                <NavLink to="docs" className={navigationMenuTriggerStyle()}>
                   API Docs
+                </NavLink>
+              </NavigationMenuItem>
+
+              <NavigationMenuItem>
+                <NavLink to="signup" className={navigationMenuTriggerStyle()}>
+                  Signup
                 </NavLink>
               </NavigationMenuItem>
 
@@ -72,7 +78,7 @@ export default function Header() {
                   <ul className="px-4 py-2 min-w-48 text-left">
                     <li>
                       <img src={accountIcon} className="inline mr-2 w-5" />
-                      <NavLink to="account"> Manage account</NavLink>
+                      <NavLink to="account/profile"> Manage account</NavLink>
                     </li>
                     <Separator className="my-2" />
                     <li>
