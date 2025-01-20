@@ -6,11 +6,17 @@ import './App.css';
 import Layout from './components/Layout';
 // Pages
 import Home from './pages/Home';
+import Login from './pages/Login.tsx';
+import Signup from './pages/Signup.tsx';
+import ForgotPassword from './pages/ForgotPassword.tsx';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<Layout />}>
       <Route index element={<Home />} />
+      <Route path="login" element={<Login />} />
+      <Route path="signup" element={<Signup />} />
+      <Route path="forgotpassword" element={<ForgotPassword />} />
     </Route>,
   ),
 );
@@ -25,10 +31,7 @@ function App() {
 
 export default App;
 
-// <Route path="" element={<Home />} />
 // <Route path="account">
-//   <Route path="login" element={<Login />} />
-//   <Route path="signup" element={<Signup />} />
 //   <Route path="profile" element={<AccountLayout />}>
 //     <Route path="overview" element={<AccountOverview />} />
 //     <Route path="info" element={<AccountInfo />} />
