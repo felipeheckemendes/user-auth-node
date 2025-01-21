@@ -12,6 +12,7 @@ import {
   NavigationMenuContent,
   NavigationMenuList,
   NavigationMenuTrigger,
+  NavigationMenuLink,
   navigationMenuTriggerStyle,
 } from '@/components/ui/navigation-menu';
 import { Separator } from '@/components/ui/separator';
@@ -77,13 +78,20 @@ export default function Header() {
                 <NavigationMenuContent>
                   <ul className="px-4 py-2 min-w-48 text-left">
                     <li>
-                      <img src={accountIcon} className="inline mr-2 w-5" />
-                      <NavLink to="account/profile"> Manage account</NavLink>
+                      <NavigationMenuLink asChild>
+                        <NavLink to="account/profile">
+                          <img src={accountIcon} className="inline mr-2 w-5" /> Manage account
+                        </NavLink>
+                      </NavigationMenuLink>
                     </li>
                     <Separator className="my-2" />
                     <li>
-                      <img src={logoutIcon} className="inline mr-2" />
-                      <NavLink to="logout">Logout</NavLink>
+                      <NavigationMenuLink asChild>
+                        <NavLink to="logout">
+                          <img src={logoutIcon} className="inline mr-2" />
+                          Logout
+                        </NavLink>
+                      </NavigationMenuLink>
                     </li>
                   </ul>
                 </NavigationMenuContent>
