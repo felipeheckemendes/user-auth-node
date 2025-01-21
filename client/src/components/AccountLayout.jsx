@@ -19,12 +19,8 @@ export default function AccountLayout() {
       url: '',
     },
     {
-      title: 'Update Info',
+      title: 'Manage Account',
       url: 'update',
-    },
-    {
-      title: 'Delete Account',
-      url: 'deleteme',
     },
   ];
 
