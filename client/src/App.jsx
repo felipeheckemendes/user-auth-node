@@ -10,6 +10,8 @@ import Home from './pages/Home';
 import Login from './pages/Login.tsx';
 import Signup from './pages/Signup.tsx';
 import ForgotPassword from './pages/ForgotPassword.tsx';
+import AccountOverview from './pages/AccountOverview';
+import AccountUpdate from './pages/AccountUpdate';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -20,8 +22,8 @@ const router = createBrowserRouter(
       <Route path="forgotpassword" element={<ForgotPassword />} />
       <Route path="account">
         <Route path="profile" element={<AccountLayout />}>
-          <Route path="overview" element={<AccountOverview />} />
-          <Route path="info" element={<AccountInfo />} />
+          <Route index element={<AccountOverview />} />
+          <Route path="update" element={<AccountUpdate />} />
         </Route>
       </Route>
     </Route>,
