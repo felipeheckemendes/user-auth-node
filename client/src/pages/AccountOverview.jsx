@@ -26,7 +26,7 @@ export default function AccountOverview() {
           Welcome{user?.info?.firstName && ', ' + user?.info?.firstName}{' '}
           {user?.info?.lastName && ' ' + user?.info?.lastName}!
         </h2>
-        <p className="text-slate-700 text-left mb-6">
+        <div className="text-slate-700 text-left mb-6">
           <ul className="space-y-3">
             <li className="text-center pb-3">
               <b>Account information</b>
@@ -47,7 +47,7 @@ export default function AccountOverview() {
               </li>
             )}
           </ul>
-        </p>
+        </div>
         <div className="text-left">
           <Link to="update">
             <Button variant="mainIndigo">Update Account Information</Button>
