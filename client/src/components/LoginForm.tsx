@@ -2,10 +2,56 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import PasswordInput from '@/components/PasswordInput';
 import { Label } from '@/components/ui/label';
 import { Link } from 'react-router';
+import { useNavigate } from 'react-router';
+import { useState } from 'react';
+const apiUrl = import.meta.env.VITE_API_URL;
+
+// Function to validate email address
+const validateEmail = (email: string) => {
+  return String(email)
+    .toLowerCase()
+    .match(
+      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+    );
+};
 
 export default function LoginForm({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
+  const [errorMessage, setErrorMessage] = useState(' ');
+  const navigate = useNavigate();
+  const [navigation, setNavigation] = useState('idle');
+
+  const logIn = async (event: { preventDefault: () => void; currentTarget: any }) => {
+    setNavigation('submitting');
+    event.preventDefault();
+    setErrorMessage(' ');
+    const formData = event.currentTarget;
+    if (!validateEmail(formData.email.value)) {
+      setErrorMessage('Please enter a valid email address.');
+      setNavigation('idle');
+      return false;
+    }
+
+    const result = await fetch(`${apiUrl}login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: formData.email.value,
+        password: formData.password.value,
+      }),
+    });
+    const response = await result.json();
+    console.log(response);
+    if (response.status !== 'success') {
+      setErrorMessage(response.message);
+      setNavigation('idle');
+      return false;
+    }
+    await navigate('/account/profile');
+  };
+
   return (
     <div className={cn('flex flex-col gap-6 mt-24', className)} {...props}>
       <Card>
@@ -14,7 +60,8 @@ export default function LoginForm({ className, ...props }: React.ComponentPropsW
           <CardDescription>Enter your email below to login to your account</CardDescription>
         </CardHeader>
         <CardContent>
-          <form>
+          <p className="text-red-500 text-sm font-semibold mb-2 text-left">{errorMessage}</p>
+          <form onSubmit={logIn}>
             <div className="flex flex-col gap-6">
               <div className="grid gap-2">
                 <Label htmlFor="email">Email</Label>
@@ -30,10 +77,15 @@ export default function LoginForm({ className, ...props }: React.ComponentPropsW
                     Forgot your password?
                   </Link>
                 </div>
-                <Input id="password" type="password" required />
+                <PasswordInput id="password" type="password" required />
               </div>
-              <Button type="submit" variant="mainIndigo" className="w-full">
-                Login
+              <Button
+                variant="mainIndigo"
+                type="submit"
+                className="w-full"
+                disabled={navigation === 'submitting'}
+              >
+                {navigation === 'submitting' ? 'Logging in' : 'Log in'}
               </Button>
             </div>
             <div className="mt-4 text-center text-sm">
