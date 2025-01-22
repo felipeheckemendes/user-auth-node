@@ -5,6 +5,7 @@ const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 const mongoSanitize = require('express-mongo-sanitize');
 const hpp = require('hpp');
+const cors = require('cors');
 
 const xssCleaner = require('./services/xssCleaner');
 const AppError = require('./services/appError');
@@ -32,11 +33,22 @@ const hppParamPolutionOptions = {
     'price',
   ],
 };
+const corsOptions = {
+  sorigin: 'http://localhost:5173',
+  // origin:
+  //   process.env.NODE_ENV === 'development'
+  //     ? process.env.DEV_FRONTEND_URL
+  //     : process.env.PROD_FRONTEND_URL,
+  methods: ['GET', 'POST', 'PATCH', 'DELETE'],
+  credentials: false,
+};
 
 // EXPRESS - Initialize
 const app = express();
 
 // EXPRESS - Global Middlewares
+app.options('*', cors(corsOptions));
+app.use(cors(corsOptions));
 app.use(helmet()); // Safe headers
 app.use(express.json(bodyParserOptions)); // Body parser
 app.use(morgan(process.env.NODE_ENV === 'development' ? 'dev' : 'combined')); // Console logging
