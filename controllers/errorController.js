@@ -17,7 +17,7 @@ const sendErrorProd = (err, res) => {
   // Sanitize expected errors. If AppError, no sanitization necessary
   let sanitizedError;
   if (err instanceof AppError) {
-    sanitizedError = { ...err };
+    sanitizedError = err ;
   } else if (err.name === 'CastError') {
     sanitizedError = new AppError(`Invalid ${err.path}: ${err.value}`, 400);
   } else if (err.code === 11000) {
