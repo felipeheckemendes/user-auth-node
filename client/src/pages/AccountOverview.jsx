@@ -1,19 +1,25 @@
 import userPlaceholder from '@/assets/user-placeholder.svg';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router';
-
-const user = {
-  email: 'john@email.com',
-  cellphone: '123456789',
-  createdAt: '2025-01-01',
-  info: {
-    firstName: 'John',
-    lastName: 'Doe',
-    photoUrl: userPlaceholder,
-  },
-};
+import { useEffect, useState } from 'react';
+const apiUrl = import.meta.env.VITE_API_URL;
 
 export default function AccountOverview() {
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const getUser = async function () {
+      const result = await fetch(`${apiUrl}/me`, {
+        method: 'GET',
+        credentials: 'include', // Ensure credentials are included
+      });
+      const data = await result.json();
+      const user = data.data;
+      return user;
+    };
+    getUser().then((user) => setUser(user));
+  }, []);
+
   return (
     <div className="mt-12 flex">
       <div className="w-3/12"></div>
@@ -23,7 +29,7 @@ export default function AccountOverview() {
           src={userPlaceholder && userPlaceholder}
         />
         <h2 className="text-5xl font-light text-slate-800 mb-12">
-          Welcome{user?.info?.firstName && ', ' + user?.info?.firstName}{' '}
+          Welcome{user?.info?.firstName && ', ' + user?.info?.firstName}
           {user?.info?.lastName && ' ' + user?.info?.lastName}!
         </h2>
         <div className="text-slate-700 text-left mb-6">
@@ -43,7 +49,8 @@ export default function AccountOverview() {
             )}
             {user?.createdAt && (
               <li>
-                <b>Account created on:</b> {user.createdAt}
+                <b>Account created on:</b>{' '}
+                {Intl.DateTimeFormat(navigator.language).format(new Date(user.createdAt))}
               </li>
             )}
           </ul>
