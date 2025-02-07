@@ -5,6 +5,7 @@
       "@/*": ["./src/*"]
     },
     "jsx": "react-jsx", // Required for JSX in React with TypeScript
+    "module": "ES2022",
     "moduleResolution": "node", // Ensure modules are resolved like in Node.js
     "strict": true // Optional: Enables strict type-checking options
   },

@@ -1,3 +1,12 @@
+/// <reference types="vite/client" />
+interface ImportMetaEnv {
+  readonly VITE_API_URL: string;
+  // add other environment variables here...
+}
+interface ImportMeta {
+  readonly env: ImportMetaEnv;
+}
+
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -41,6 +50,7 @@ export default function LoginForm({ className, ...props }: React.ComponentPropsW
         email: formData.email.value,
         password: formData.password.value,
       }),
+      credentials: 'include',
     });
     const response = await result.json();
     console.log(response);
