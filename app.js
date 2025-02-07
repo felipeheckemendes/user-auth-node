@@ -34,13 +34,9 @@ const hppParamPolutionOptions = {
   ],
 };
 const corsOptions = {
-  sorigin: 'http://localhost:5173',
-  // origin:
-  //   process.env.NODE_ENV === 'development'
-  //     ? process.env.DEV_FRONTEND_URL
-  //     : process.env.PROD_FRONTEND_URL,
+  origin: 'http://localhost:5173',
+  credentials: true,
   methods: ['GET', 'POST', 'PATCH', 'DELETE'],
-  credentials: false,
 };
 
 // EXPRESS - Initialize
