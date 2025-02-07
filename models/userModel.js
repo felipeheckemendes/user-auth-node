@@ -75,6 +75,18 @@ const userSchema = new mongoose.Schema(
       default: 'user',
       required: true,
     },
+    information: {
+      firstName: {
+        type: String,
+        required: false,
+        match: [/^[a-zA-Z]+$/, 'First name must contain only letters'],
+      },
+      lastName: {
+        type: String,
+        required: false,
+        match: [/^[a-zA-Z\s]+$/, 'Last name must contain only letters and spaces'],
+      },
+    },
   },
   {
     timestamps: true,
