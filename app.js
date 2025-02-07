@@ -6,6 +6,7 @@ const rateLimit = require('express-rate-limit');
 const mongoSanitize = require('express-mongo-sanitize');
 const hpp = require('hpp');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 
 const xssCleaner = require('./services/xssCleaner');
 const AppError = require('./services/appError');
@@ -47,6 +48,7 @@ app.options('*', cors(corsOptions));
 app.use(cors(corsOptions));
 app.use(helmet()); // Safe headers
 app.use(express.json(bodyParserOptions)); // Body parser
+app.use(cookieParser());
 app.use(morgan(process.env.NODE_ENV === 'development' ? 'dev' : 'combined')); // Console logging
 app.use('/api', rateLimitGlobal); // Rate limniter for the API
 app.use(mongoSanitize()); // Data sanitization against NOSQL query injection

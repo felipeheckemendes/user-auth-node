@@ -25,14 +25,15 @@ const createAndSendToken = (statusCode, user, res) => {
   const payload = {
     id: user._id,
     iat: Math.floor(Date.now() / 1000 - 10),
-    exp: Math.floor(Date.now() / 1000 + 60 * 24 * process.env.JWT_EXPIRES_DAYS),
+    exp: Math.floor(Date.now() / 1000 + 1000 * 60 * 60 * 24 * process.env.JWT_EXPIRES_DAYS),
   };
   const token = jwt.sign(payload, process.env.JWTSECRET);
 
   const cookieOptions = {};
   cookieOptions.expires = new Date(Date.now() + process.env.JWT_EXPIRES_DAYS * 24 * 60 * 60 * 1000);
   cookieOptions.httpOnly = true; // This restricts cookie to the browser
-  cookieOptions.secure = process.env.NODE_ENV !== 'development'; // Cookie is sent only on https if not in production
+  cookieOptions.secure = true; // Set to true even on dev, because browser won't accept Same-Site=None without secure, which is required for cross-site cookies
+  cookieOptions.sameSite = 'None'; // Ensure cross-site cookies are sent
 
   res.cookie('jwt', token, cookieOptions);
   const sanitizedUser = sanitizeBlackList(user._doc, [
@@ -98,12 +99,18 @@ exports.isAuthenticated = async (req, res, next) => {
   try {
     // If authentication header is present, try to get the Bearer Token
     let token;
+
+    // Check if JWT token is present in the cookie
+    if (req.cookies && req.cookies.jwt) {
+      token = req.cookies.jwt; // Assuming you are using a library like `cookie-parser`
+    }
+
     if (req.headers.authorization && req.headers.authorization.startsWith('Bearer'))
       token = req.headers.authorization.split(' ')[1];
     // Check if JWT Bearer Token was sent on headers and is valid
     if (!token || !validateToken(token))
       return next(
-        new AppError('You are not logged in. Please log in to access this resource', 401),
+        new AppError('You are not logged in. Please log in to access this resource 2', 401),
       );
     // Decode token and find user
     const tokenPayload = jwt.decode(token);
