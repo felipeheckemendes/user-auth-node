@@ -15,12 +15,12 @@ const errorController = require('./controllers/errorController');
 
 // CONFIGURATIONS
 const rateLimitGlobal = rateLimit({
-  max: 10,
-  windowMs: 60 * 60 * 100, // 60 minutes
+  max: 100,
+  windowMs: 1000 * 60, // 60 seconds
   statusCode: 400,
   message: {
     status: 'fail',
-    message: 'Too many requests from your IP, please try again in an hour',
+    message: 'Too many requests from your IP, please try again in a minute',
   },
 });
 const bodyParserOptions = { limit: '10kb' };
