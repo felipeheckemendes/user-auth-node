@@ -351,6 +351,35 @@ exports.updateMe = async (req, res, next) => {
   }
 };
 
+exports.updateMyEmail = async (req, res, next) => {
+  try {
+    // Find user in DB
+    const user = await User.findById(req.user.id);
+
+    // Allow user to update only information on this request
+    let data = sanitizeWhiteList(req.body, ['email', 'password']);
+
+    // Check if password provided on request body is correct
+    if (!data.password || !(await bcrypt.compare(data.password, user.password)))
+      return next(new AppError('Please provide your current password.', 400));
+
+    // Remove password from data before updating
+    data = sanitizeWhiteList(req.body, ['email']);
+
+    // Update user
+    Object.assign(user, data);
+    const updatedUser = await user.save();
+
+    // Send response back to client
+    res.status(200).json({
+      status: 'success',
+      user: updatedUser,
+    });
+  } catch (err) {
+    return next(err);
+  }
+};
+
 exports.deactivateMe = async (req, res, next) => {
   try {
     // Find user in DB

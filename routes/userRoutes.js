@@ -40,6 +40,7 @@ router.use(userController.isAuthenticated);
 router.route('/updatePassword').patch(sanitizeUser, userController.updatePassword);
 router.route('/me').get(sanitizeUser, userController.getMe);
 router.route('/updateMe').patch(sanitizeUser, userController.updateMe);
+router.route('/updateMyEmail').patch(sanitizeUser, userController.updateMyEmail);
 router.route('/deactivateMe').patch(sanitizeUser, userController.deactivateMe);
 
 // ADMIN ROUTES
