@@ -6,18 +6,58 @@ import PasswordInput from '@/components/PasswordInput';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
 import userPlaceholder from '@/assets/user-placeholder.svg';
+import { useNavigate } from 'react-router';
+import { useEffect, useState } from 'react';
+const apiUrl = import.meta.env.VITE_API_URL;
 
-const user = {
-  email: 'john@email.com',
-  cellphone: '123456789',
-  createdAt: '2025-01-01',
-  info: {
-    firstName: 'John',
-    lastName: 'Doe',
-  },
-};
+export default function AccountUpdate({ user, setUser }) {
+  const navigate = useNavigate();
+  const [userInfoFormData, setUserInfoFormData] = useState({
+    firstName: user?.information?.firstName || '',
+    lastName: user?.information?.lastName || '',
+    cellphone: user?.cellphone || '',
+  });
+  const [messageUserInfo, setMessageUserInfo] = useState('');
 
-export default function AccountUpdate() {
+  useEffect(() => {
+    setUserInfoFormData({
+      firstName: user?.information?.firstName || '',
+      lastName: user?.information?.lastName || '',
+      cellphone: user?.cellphone || '',
+    });
+  }, [user]);
+
+  const handleUserInfoChange = function (event) {
+    setUserInfoFormData({ ...userInfoFormData, [event.target.id]: event.target.value });
+  };
+
+  const updateUserInfo = async function (event) {
+    event.preventDefault();
+    const response = await fetch(`${apiUrl}/updateMe`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body: JSON.stringify({
+        information: {
+          firstName: userInfoFormData.firstName,
+          lastName: userInfoFormData.lastName,
+        },
+        cellphone: userInfoFormData.cellphone,
+      }),
+    });
+    if (response.ok) {
+      const data = await response.json();
+      setUser(data.user);
+      await navigate('/account/profile');
+    } else {
+      const data = await response.json();
+      console.log(data.message);
+      setMessageUserInfo(data.message);
+    }
+  };
+
   return (
     <>
       <div className="my-12 flex justify-center ">
@@ -29,7 +69,7 @@ export default function AccountUpdate() {
           <div className="m-6 text-left flex items-end">
             <img
               className="w-24  rounded-full border-2 mr-8"
-              src={user.info.imageUrl || userPlaceholder}
+              src={user?.information?.imageUrl || userPlaceholder}
             />
             <Button variant="outline" className="text-xs bg-transparent mb-2">
               Change profile picture
@@ -38,23 +78,36 @@ export default function AccountUpdate() {
 
           <Separator />
 
-          <form className="text-left space-y-4">
+          <form onSubmit={updateUserInfo} className="text-left space-y-4">
             <div className=" space-x-4 flex">
               <div className="flex-1 space-y-1">
-                <Label htmlFor="firstname">First Name</Label>
-                <Input id="firstname" value={user.info.firstName || ''}></Input>
+                <Label htmlFor="firstName">First Name</Label>
+                <Input
+                  id="firstName"
+                  value={userInfoFormData.firstName}
+                  onChange={handleUserInfoChange}
+                ></Input>
               </div>
               <div className="flex-1 space-y-1">
-                <Label htmlFor="lastname">Last Name</Label>
-                <Input id="lastname" value={user.info.lastName || ''} />
+                <Label htmlFor="lastName">Last Name</Label>
+                <Input
+                  id="lastName"
+                  value={userInfoFormData.lastName}
+                  onChange={handleUserInfoChange}
+                />
               </div>
             </div>
             <div className="flex-1 space-y-1">
-              <Label htmlFor="lastname">Cellphone Number</Label>
-              <Input id="lastname" value={user.info.cellphone || ''} />
+              <Label htmlFor="cellphone">Cellphone Number</Label>
+              <Input
+                id="cellphone"
+                value={userInfoFormData.cellphone}
+                onChange={handleUserInfoChange}
+              />
             </div>
 
             <div className="text-right">
+              <p className="text-red-500 text-sm font-semibold mb-2 text-left">{messageUserInfo}</p>
               <Button variant="mainIndigo">Save changes</Button>
             </div>
           </form>
@@ -69,7 +122,7 @@ export default function AccountUpdate() {
           <form className="text-left space-y-4">
             <div className="space-y-1">
               <Label htmlFor="email">Current Email Address</Label>
-              <Input id="email" value={user.email} disabled></Input>
+              <Input id="email" value={user?.email} disabled></Input>
             </div>
             <div className="space-y-1">
               <Label htmlFor="newemail">New Email Address</Label>
