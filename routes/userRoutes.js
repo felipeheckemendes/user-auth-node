@@ -43,6 +43,7 @@ router.route('/me').get(sanitizeUser, userController.getMe);
 router.route('/updateMe').patch(sanitizeUser, userController.updateMe);
 router.route('/updateMyEmail').patch(sanitizeUser, userController.updateMyEmail);
 router.route('/deactivateMe').patch(sanitizeUser, userController.deactivateMe);
+router.route('/deleteMe').delete(sanitizeUser, userController.deleteMe);
 
 // ADMIN ROUTES
 router.use(userController.isAuthenticated, userController.restrictTo('admin'), sanitizeAdmin);

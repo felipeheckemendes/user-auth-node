@@ -147,7 +147,6 @@ exports.restrictTo = function (...allowedRoles) {
 };
 
 exports.logout = async (req, res, next) => {
-  console.log('WE ARE HERE 1ST');
   try {
     const payload = {};
     const token = jwt.sign(payload, process.env.JWTSECRET);
@@ -421,6 +420,31 @@ exports.deactivateMe = async (req, res, next) => {
     res.status(204).json({
       status: 'success',
       data: updatedUser,
+    });
+  } catch (err) {
+    return next(err);
+  }
+};
+
+exports.deleteMe = async (req, res, next) => {
+  try {
+    // Try to find user in DB
+    const user = await User.findById(req.user.id).select('+password');
+
+    // Check if there is any user with provided Id
+    if (!user) return next(new AppError('User not found. Please try again.'));
+
+    // Check if password provided on request body is correct
+    if (!req.body.password || !(await bcrypt.compare(req.body.password, user.password)))
+      return next(new AppError('Please provide your current password.', 400));
+
+    // Find user in DB and try to delete
+    const deletedUser = await User.findByIdAndDelete(req.user.id).select('+password');
+
+    // Send response to client
+    res.status(200).json({
+      status: 'success',
+      data: deletedUser,
     });
   } catch (err) {
     return next(err);
