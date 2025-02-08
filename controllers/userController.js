@@ -335,7 +335,7 @@ exports.updateMe = async (req, res, next) => {
     const user = await User.findById(req.user.id);
 
     // Allow user to update only information on this request
-    const data = sanitizeWhiteList(req.body, ['information']);
+    const data = sanitizeWhiteList(req.body, ['information', 'cellphone']);
 
     // Update user
     Object.assign(user, data);
