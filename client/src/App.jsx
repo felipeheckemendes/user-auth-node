@@ -7,6 +7,7 @@ import Layout from './components/Layout';
 import AccountLayout from './components/AccountLayout';
 // Pages
 import Home from './pages/Home';
+import Contact from './pages/Contact.jsx';
 import Login from './pages/Login.tsx';
 import Logout from './pages/Logout.jsx';
 import Signup from './pages/Signup.tsx';
@@ -45,9 +46,10 @@ function App() {
     createRoutesFromElements(
       <Route path="/" element={<Layout user={user} setUser={setUser} />}>
         <Route index element={<Home />} />
+        <Route path="contact" element={<Contact setUser={setUser} />} />
         <Route path="login" element={<Login setUser={setUser} />} />
         <Route path="logout" element={<Logout user={user} setUser={setUser} />} />
-        <Route path="signup" element={<Signup />} />
+        <Route path="signup" element={<Signup setUser={setUser} />} />
         <Route path="forgotpassword" element={<ForgotPassword />} />
         <Route path="account">
           <Route path="profile" element={<AccountLayout />}>

@@ -3,9 +3,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Alert } from '@/components/ui/alert';
-import { useNavigate, useNavigation } from 'react-router';
-import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router';
+import { useState } from 'react';
 import PasswordInput from '@/components/PasswordInput';
 const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -18,7 +17,11 @@ const validateEmail = (email: string) => {
     );
 };
 
-export default function SignupForm({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
+export default function SignupForm({
+  className,
+  setUser,
+  ...props
+}: React.ComponentPropsWithoutRef<'div'>) {
   const [errorMessage, setErrorMessage] = useState(' ');
   const navigate = useNavigate();
   const [navigation, setNavigation] = useState('idle');
@@ -51,6 +54,7 @@ export default function SignupForm({ className, ...props }: React.ComponentProps
         password: formData.password.value,
         passwordConfirm: formData.passwordConfirm.value,
       }),
+      credentials: 'include',
     });
     const response = await result.json();
     console.log(response);
@@ -59,6 +63,7 @@ export default function SignupForm({ className, ...props }: React.ComponentProps
       setNavigation('idle');
       return false;
     }
+    setUser(response.data);
     await navigate('/account/profile');
   };
 
