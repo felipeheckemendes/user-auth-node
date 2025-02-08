@@ -107,6 +107,7 @@ exports.isAuthenticated = async (req, res, next) => {
 
     if (req.headers.authorization && req.headers.authorization.startsWith('Bearer'))
       token = req.headers.authorization.split(' ')[1];
+
     // Check if JWT Bearer Token was sent on headers and is valid
     if (!token || !validateToken(token))
       return next(
@@ -143,6 +144,29 @@ exports.restrictTo = function (...allowedRoles) {
       return next(new AppError('You do not have permission to perform this action.', 403));
     return next();
   };
+};
+
+exports.logout = async (req, res, next) => {
+  console.log('WE ARE HERE 1ST');
+  try {
+    const payload = {};
+    const token = jwt.sign(payload, process.env.JWTSECRET);
+
+    const cookieOptions = {};
+    cookieOptions.expires = new Date(
+      Date.now() + process.env.JWT_EXPIRES_DAYS * 24 * 60 * 60 * 1000,
+    );
+    cookieOptions.httpOnly = true; // This restricts cookie to the browser
+    cookieOptions.secure = true; // Set to true even on dev, because browser won't accept Same-Site=None without secure, which is required for cross-site cookies
+    cookieOptions.sameSite = 'None'; // Ensure cross-site cookies are sent
+    res.cookie('jwt', '', cookieOptions);
+    res.status(200).json({
+      status: 'success',
+      token: '',
+    });
+  } catch (err) {
+    next(err);
+  }
 };
 
 exports.updatePassword = async (req, res, next) => {

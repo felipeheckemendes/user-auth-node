@@ -37,6 +37,7 @@ router.patch('/resetPassword', sanitizeUser, userController.resetPassword);
 
 // AUTHENTICATED ROUTES
 router.use(userController.isAuthenticated);
+router.route('/logout').post(sanitizeUser, userController.logout);
 router.route('/updatePassword').patch(sanitizeUser, userController.updatePassword);
 router.route('/me').get(sanitizeUser, userController.getMe);
 router.route('/updateMe').patch(sanitizeUser, userController.updateMe);
