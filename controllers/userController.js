@@ -5,7 +5,7 @@ const User = require('../models/userModel');
 const AppError = require('../services/appError');
 const sendEmail = require('../services/email/sendEmail');
 const emailTemplates = require('../services/email/emailTemplates');
-const { sanitizeBlackList } = require('./sanitizers');
+const { sanitizeBlackList, sanitizeWhiteList } = require('./sanitizers');
 
 function validateToken(token) {
   try {
@@ -332,21 +332,10 @@ exports.getMe = (req, res, next) => {
 exports.updateMe = async (req, res, next) => {
   try {
     // Find user in DB
-    const user = await User.findById(req.user.id).select('+password');
+    const user = await User.findById(req.user.id);
 
-    // Compare password
-
-    // Check if password provided on request body is correct
-    if (!req.body.password || !(await bcrypt.compare(req.body.password, user.password)))
-      return next(
-        new AppError(
-          'Please provide your current password in order to update user information.',
-          400,
-        ),
-      );
-
-    // Remove password from request body
-    const data = sanitizeBlackList(req.body, ['password', 'passwordConfirm']);
+    // Allow user to update only information on this request
+    const data = sanitizeWhiteList(req.body, ['information']);
 
     // Update user
     Object.assign(user, data);
