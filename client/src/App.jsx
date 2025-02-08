@@ -15,6 +15,7 @@ import ForgotPassword from './pages/ForgotPassword.tsx';
 import AccountOverview from './pages/AccountOverview';
 import AccountUpdate from './pages/AccountUpdate';
 import { useEffect, useState } from 'react';
+import RequireAuth from './hooks/requireAuth';
 const apiUrl = import.meta.env.VITE_API_URL;
 
 function App() {
@@ -51,7 +52,7 @@ function App() {
         <Route path="logout" element={<Logout user={user} setUser={setUser} />} />
         <Route path="signup" element={<Signup setUser={setUser} />} />
         <Route path="forgotpassword" element={<ForgotPassword />} />
-        <Route path="account">
+        <Route path="account" element={<RequireAuth user={user} setUser={setUser} />}>
           <Route path="profile" element={<AccountLayout />}>
             <Route index element={<AccountOverview user={user} />} />
             <Route path="update" element={<AccountUpdate user={user} setUser={setUser} />} />

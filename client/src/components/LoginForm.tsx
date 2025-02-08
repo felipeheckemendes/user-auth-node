@@ -13,7 +13,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import PasswordInput from '@/components/PasswordInput';
 import { Label } from '@/components/ui/label';
-import { Link } from 'react-router';
+import { Link, useSearchParams } from 'react-router';
 import { useNavigate } from 'react-router';
 import { useState } from 'react';
 const apiUrl = import.meta.env.VITE_API_URL;
@@ -35,6 +35,9 @@ export default function LoginForm({
   const [errorMessage, setErrorMessage] = useState(' ');
   const navigate = useNavigate();
   const [navigation, setNavigation] = useState('idle');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const message = searchParams.get('message');
+  const redirectTo = searchParams.get('redirectTo') || '/account/profile';
 
   const logIn = async (event: { preventDefault: () => void; currentTarget: any }) => {
     setNavigation('submitting');
@@ -64,7 +67,7 @@ export default function LoginForm({
       return false;
     }
     setUser(response.data);
-    await navigate('/account/profile');
+    await navigate(redirectTo);
   };
 
   return (
@@ -76,6 +79,7 @@ export default function LoginForm({
         </CardHeader>
         <CardContent>
           <p className="text-red-500 text-sm font-semibold mb-2 text-left">{errorMessage}</p>
+          <p className="text-blue-500 text-sm font-semibold mb-2 text-center">{message}</p>
           <form onSubmit={logIn}>
             <div className="flex flex-col gap-6">
               <div className="grid gap-2">
