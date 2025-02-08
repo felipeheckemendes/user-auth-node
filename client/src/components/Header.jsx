@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/navigation-menu';
 import { Separator } from '@/components/ui/separator';
 
-export default function Header() {
+export default function Header({ user, isLoggedIn }) {
   return (
     <>
       <div className="h-10 flex justify-center items-center bg-blue-950 text-white py-10 px-0 md:px-8">
@@ -51,53 +51,58 @@ export default function Header() {
                   API Docs
                 </NavLink>
               </NavigationMenuItem>
+              {!user && (
+                <>
+                  <NavigationMenuItem>
+                    <NavLink to="signup" className={navigationMenuTriggerStyle()}>
+                      Signup
+                    </NavLink>
+                  </NavigationMenuItem>
 
-              <NavigationMenuItem>
-                <NavLink to="signup" className={navigationMenuTriggerStyle()}>
-                  Signup
-                </NavLink>
-              </NavigationMenuItem>
-
-              <NavigationMenuItem>
-                <NavLink
-                  to="login"
-                  className={navigationMenuTriggerStyle() + ' border-2 border-blue-200'}
-                >
-                  Login
-                </NavLink>
-              </NavigationMenuItem>
+                  <NavigationMenuItem>
+                    <NavLink
+                      to="login"
+                      className={navigationMenuTriggerStyle() + ' border-2 border-blue-200'}
+                    >
+                      Login
+                    </NavLink>
+                  </NavigationMenuItem>
+                </>
+              )}
             </NavigationMenuList>
           </NavigationMenu>
-
-          <NavigationMenu className="ml-1">
-            <NavigationMenuList>
-              <NavigationMenuItem>
-                <NavigationMenuTrigger>
-                  John Smith <img src={avatarIcon} className="pl-2 max-h-5" />{' '}
-                </NavigationMenuTrigger>
-                <NavigationMenuContent>
-                  <ul className="px-4 py-2 min-w-48 text-left">
-                    <li>
-                      <NavigationMenuLink asChild>
-                        <NavLink to="account/profile">
-                          <img src={accountIcon} className="inline mr-2 w-5" /> Manage account
-                        </NavLink>
-                      </NavigationMenuLink>
-                    </li>
-                    <Separator className="my-2" />
-                    <li>
-                      <NavigationMenuLink asChild>
-                        <NavLink to="logout">
-                          <img src={logoutIcon} className="inline mr-2" />
-                          Logout
-                        </NavLink>
-                      </NavigationMenuLink>
-                    </li>
-                  </ul>
-                </NavigationMenuContent>
-              </NavigationMenuItem>
-            </NavigationMenuList>
-          </NavigationMenu>
+          {user && (
+            <NavigationMenu className="ml-1">
+              <NavigationMenuList>
+                <NavigationMenuItem>
+                  <NavigationMenuTrigger>
+                    {user?.information.firstName || user?.email}
+                    <img src={avatarIcon} className="pl-2 max-h-5" />{' '}
+                  </NavigationMenuTrigger>
+                  <NavigationMenuContent>
+                    <ul className="px-4 py-2 min-w-48 text-left">
+                      <li>
+                        <NavigationMenuLink asChild>
+                          <NavLink to="account/profile">
+                            <img src={accountIcon} className="inline mr-2 w-5" /> Manage account
+                          </NavLink>
+                        </NavigationMenuLink>
+                      </li>
+                      <Separator className="my-2" />
+                      <li>
+                        <NavigationMenuLink asChild>
+                          <NavLink to="logout">
+                            <img src={logoutIcon} className="inline mr-2" />
+                            Logout
+                          </NavLink>
+                        </NavigationMenuLink>
+                      </li>
+                    </ul>
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
+              </NavigationMenuList>
+            </NavigationMenu>
+          )}
         </div>
       </div>
     </>

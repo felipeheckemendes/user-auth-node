@@ -12,25 +12,51 @@ import Signup from './pages/Signup.tsx';
 import ForgotPassword from './pages/ForgotPassword.tsx';
 import AccountOverview from './pages/AccountOverview';
 import AccountUpdate from './pages/AccountUpdate';
-
-const router = createBrowserRouter(
-  createRoutesFromElements(
-    <Route path="/" element={<Layout />}>
-      <Route index element={<Home />} />
-      <Route path="login" element={<Login />} />
-      <Route path="signup" element={<Signup />} />
-      <Route path="forgotpassword" element={<ForgotPassword />} />
-      <Route path="account">
-        <Route path="profile" element={<AccountLayout />}>
-          <Route index element={<AccountOverview />} />
-          <Route path="update" element={<AccountUpdate />} />
-        </Route>
-      </Route>
-    </Route>,
-  ),
-);
+import { useEffect, useState } from 'react';
+const apiUrl = import.meta.env.VITE_API_URL;
 
 function App() {
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const getUser = async function () {
+      const response = await fetch(`${apiUrl}/me`, {
+        method: 'GET',
+        credentials: 'include', // Ensure credentials are included
+      });
+      if (response.ok) {
+        const data = await response.json();
+        const user = data.data;
+        return user;
+      } else {
+        console.log('User not logged in');
+        return null;
+      }
+    };
+    getUser().then((user) => {
+      if (user) {
+        setUser(user);
+      }
+    });
+  }, []);
+
+  const router = createBrowserRouter(
+    createRoutesFromElements(
+      <Route path="/" element={<Layout user={user} setUser={setUser} />}>
+        <Route index element={<Home />} />
+        <Route path="login" element={<Login setUser={setUser} />} />
+        <Route path="signup" element={<Signup />} />
+        <Route path="forgotpassword" element={<ForgotPassword />} />
+        <Route path="account">
+          <Route path="profile" element={<AccountLayout />}>
+            <Route index element={<AccountOverview user={user} />} />
+            <Route path="update" element={<AccountUpdate user={user} setUser={setUser} />} />
+          </Route>
+        </Route>
+      </Route>,
+    ),
+  );
+
   return (
     <>
       <RouterProvider router={router} />
@@ -39,13 +65,3 @@ function App() {
 }
 
 export default App;
-
-// <Route path="users" element={<UsersLayout />}>
-//   <Route index element={<UsersList />} />
-//   <Route path=":id" element={<UpdateUser />} />
-//   <Route path=":id/update" element={<UpdateUser />} />
-//   <Route path="createuser" element={<CreateUser />} />
-// </Route>
-// <Route path="docs" element={<DocsLayout />}>
-//   <h1>Docs Subroutes here</h1>
-// </Route>

@@ -23,18 +23,18 @@ export default function AccountOverview() {
   return (
     <div className="mt-12 flex">
       <div className="w-3/12"></div>
-      <div className="relative pl-16 pt-4">
+      <div className="relative pl-8 pt-4">
         <img
           className="w-36 rounded-full border-2 mr-12 absolute top-0 left-0 transform -translate-x-full"
           src={userPlaceholder && userPlaceholder}
         />
         <h2 className="text-5xl font-light text-slate-800 mb-12">
-          Welcome{user?.info?.firstName && ', ' + user?.info?.firstName}
-          {user?.info?.lastName && ' ' + user?.info?.lastName}!
+          Welcome{user?.information?.firstName && ', ' + user?.information?.firstName}
+          {user?.information?.lastName && ' ' + user?.information?.lastName}!
         </h2>
         <div className="text-slate-700 text-left mb-6">
           <ul className="space-y-3">
-            <li className="text-center pb-3">
+            <li className="text-left pb-3">
               <b>Account information</b>
             </li>
             {user?.email && (

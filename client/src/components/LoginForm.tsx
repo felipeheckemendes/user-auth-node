@@ -27,7 +27,11 @@ const validateEmail = (email: string) => {
     );
 };
 
-export default function LoginForm({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
+export default function LoginForm({
+  className,
+  setUser,
+  ...props
+}: React.ComponentPropsWithoutRef<'div'>) {
   const [errorMessage, setErrorMessage] = useState(' ');
   const navigate = useNavigate();
   const [navigation, setNavigation] = useState('idle');
@@ -59,6 +63,7 @@ export default function LoginForm({ className, ...props }: React.ComponentPropsW
       setNavigation('idle');
       return false;
     }
+    setUser(response.data);
     await navigate('/account/profile');
   };
 
