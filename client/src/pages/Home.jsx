@@ -10,8 +10,8 @@ export default function Home() {
             A Token-Based <span className="whitespace-nowrap">Authentication API.</span>
           </p>
           <p className="">
-            This personal side project showcases a simple yet robust user authentication system,
-            built using Node.js, Express and MongoDB.
+            This personal side project showcases a simple yet robust user authentication API, built
+            using Node.js, Express and MongoDB.
           </p>
           <p className="">Developed as part of my learning journey in full-stack development.</p>
           <p className="">Explore the API documentation below:</p>
@@ -25,8 +25,8 @@ export default function Home() {
         <div className="w-6/12 text-left space-y-4">
           <p className="font-tinos text-4xl">Sign up and test!</p>
           <p className="">
-            Sign up and test a simple <span className="italic">React</span> front-end powered by the
-            authentication API.
+            Sign up and test a simple <span className="italic font-bold">React</span> front-end
+            powered by the authentication API.
           </p>
           <Button
             className="bg-indigo-500 text-white drop-shadow-2xl shadow-lg w-56 border-slate-700"

@@ -1,7 +1,7 @@
 // Libraries
 import { Link, NavLink } from 'react-router';
 // Assets
-import logo from '@/assets/logo.svg';
+import logo from '@/assets/shield.svg';
 import avatarIcon from '@/assets/avatar.svg';
 import accountIcon from '@/assets/account.svg';
 import logoutIcon from '@/assets/logout.svg';
@@ -41,7 +41,7 @@ export default function Header({ user, isLoggedIn }) {
               </NavigationMenuItem>
 
               <NavigationMenuItem>
-                <NavLink to="about" className={navigationMenuTriggerStyle()}>
+                <NavLink to="/" className={navigationMenuTriggerStyle()}>
                   About
                 </NavLink>
               </NavigationMenuItem>
