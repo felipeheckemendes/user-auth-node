@@ -8,6 +8,7 @@ import AccountLayout from './components/AccountLayout';
 // Pages
 import Home from './pages/Home';
 import Login from './pages/Login.tsx';
+import Logout from './pages/Logout.jsx';
 import Signup from './pages/Signup.tsx';
 import ForgotPassword from './pages/ForgotPassword.tsx';
 import AccountOverview from './pages/AccountOverview';
@@ -45,6 +46,7 @@ function App() {
       <Route path="/" element={<Layout user={user} setUser={setUser} />}>
         <Route index element={<Home />} />
         <Route path="login" element={<Login setUser={setUser} />} />
+        <Route path="logout" element={<Logout user={user} setUser={setUser} />} />
         <Route path="signup" element={<Signup />} />
         <Route path="forgotpassword" element={<ForgotPassword />} />
         <Route path="account">
